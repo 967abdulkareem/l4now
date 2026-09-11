@@ -1,5 +1,6 @@
 import { BrandLogo } from "@/components/brand-logo";
 import { site } from "@/lib/site";
+import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/whatsapp";
 
 const year = new Date().getFullYear();
 
@@ -26,10 +27,12 @@ export function SiteFooter() {
           <ul className="mt-4 flex flex-col gap-2.5 text-[0.94rem]">
             <li>
               <a
-                href={site.contact.phoneHref}
+                href={whatsappLink(`Hello ${site.name} — I have a question.`)}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-ink hover:text-brand hover:underline"
               >
-                {site.contact.phoneDisplay}
+                WhatsApp {WHATSAPP_DISPLAY}
               </a>
             </li>
             <li>

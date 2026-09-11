@@ -25,8 +25,8 @@ export function Reservation() {
                 Ready for your next turn?
               </h2>
               <p className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
-                Tell us where you are and roughly when suits. No deposit, no
-                card details, no obligation.
+                Tell us when suits and we will come back with a slot. No
+                deposit, no card details, no obligation.
               </p>
 
               <dl className="mt-9 flex flex-col gap-5 border-t border-hairline pt-7">
@@ -99,8 +99,8 @@ export function Reservation() {
                   Lesson enquiry
                 </h3>
                 <p className="mt-2 max-w-[38rem] text-[0.95rem] text-muted-foreground">
-                  Every field below helps us match you with a slot. It takes
-                  about a minute.
+                  Fill this in and WhatsApp opens with the details ready to
+                  send. It takes about a minute.
                 </p>
                 <BookingForm />
               </div>
