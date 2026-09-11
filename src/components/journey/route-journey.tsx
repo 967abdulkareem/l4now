@@ -1,0 +1,478 @@
+"use client";
+
+import { useRef, type ReactNode } from "react";
+
+import { ScrollTrigger, gsap, useGSAP } from "@/lib/gsap";
+import { HERO_PINS, MAP_VIEWBOX, ROUTE_PTS } from "@/lib/map-data";
+
+type Pt = [number, number];
+
+/** Corner softening on the layout-driven part of the route. */
+const CORNER = 22;
+
+/* ------------------------------------------------------------------ maths */
+
+/** Axis-aligned polyline -> path string, with small radii on the corners. */
+function roundedPath(pts: Pt[], radius: number) {
+  if (pts.length < 2) return "";
+  const d = [`M ${round(pts[0][0])} ${round(pts[0][1])}`];
+
+  for (let i = 1; i < pts.length - 1; i += 1) {
+    const [p0, p1, p2] = [pts[i - 1], pts[i], pts[i + 1]];
+    const v0: Pt = [p1[0] - p0[0], p1[1] - p0[1]];
+    const v1: Pt = [p2[0] - p1[0], p2[1] - p1[1]];
+    const l0 = Math.hypot(...v0) || 1;
+    const l1 = Math.hypot(...v1) || 1;
+    const r = Math.min(radius, l0 / 2, l1 / 2);
+    const a: Pt = [p1[0] - (v0[0] / l0) * r, p1[1] - (v0[1] / l0) * r];
+    const b: Pt = [p1[0] + (v1[0] / l1) * r, p1[1] + (v1[1] / l1) * r];
+    d.push(`L ${round(a[0])} ${round(a[1])}`);
+    d.push(`Q ${round(p1[0])} ${round(p1[1])} ${round(b[0])} ${round(b[1])}`);
+  }
+
+  const last = pts[pts.length - 1];
+  d.push(`L ${round(last[0])} ${round(last[1])}`);
+  return d.join(" ");
+}
+
+const round = (n: number) => Math.round(n * 10) / 10;
+
+/** Drops points that would double back or sit on top of their neighbour. */
+function tidy(pts: Pt[]) {
+  const out: Pt[] = [];
+  for (const p of pts) {
+    const prev = out[out.length - 1];
+    if (prev && Math.hypot(p[0] - prev[0], p[1] - prev[1]) < 2) continue;
+    out.push(p);
+  }
+  return out;
+}
+
+/**
+ * The map SVG uses `preserveAspectRatio="xMidYMid slice"`, so design-space
+ * points have to go through the same transform to land on the drawn roads.
+ */
+function mapProjector(box: Box) {
+  const scale = Math.max(box.w / MAP_VIEWBOX.w, box.h / MAP_VIEWBOX.h);
+  const dx = box.left + (box.w - MAP_VIEWBOX.w * scale) / 2;
+  const dy = box.top + (box.h - MAP_VIEWBOX.h * scale) / 2;
+  return (p: readonly [number, number]): Pt => [
+    dx + p[0] * scale,
+    dy + p[1] * scale,
+  ];
+}
+
+type Box = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  w: number;
+  h: number;
+  cx: number;
+  cy: number;
+};
+
+/* -------------------------------------------------------------- component */
+
+/**
+ * One continuous GPS route across the hero, the three stages, the course
+ * cards and the booking panel.
+ *
+ * The route is built in the wrapper's own pixel space from measured layout —
+ * lane elements and card edges — so it always runs through real empty space
+ * rather than across content, at any width. It is rebuilt on resize.
+ */
+export function RouteJourney({ children }: { children: ReactNode }) {
+  const wrap = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const root = wrap.current;
+      if (!root) return;
+
+      const svg = root.querySelector<SVGSVGElement>("[data-route-svg]");
+      const base = root.querySelector<SVGPathElement>('[data-route="base"]');
+      const done = root.querySelector<SVGPathElement>('[data-route="done"]');
+      const dot = root.querySelector<SVGGElement>("[data-gps-dot]");
+      const finishMark = root.querySelector<SVGGElement>("[data-destination]");
+      if (!svg || !base || !done || !dot || !finishMark) return;
+
+      const pins = Array.from(
+        root.querySelectorAll<SVGGElement>("[data-route-pin]"),
+      );
+      const cards = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-course-card]"),
+      );
+
+      const box = (el: Element | null, wrapRect: DOMRect): Box | null => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          left: r.left - wrapRect.left,
+          top: r.top - wrapRect.top,
+          right: r.right - wrapRect.left,
+          bottom: r.bottom - wrapRect.top,
+          w: r.width,
+          h: r.height,
+          cx: r.left - wrapRect.left + r.width / 2,
+          cy: r.top - wrapRect.top + r.height / 2,
+        };
+      };
+
+      /** Builds the waypoints for the current layout. */
+      function buildRoute() {
+        const wrapRect = root!.getBoundingClientRect();
+        const W = root!.offsetWidth;
+        const H = root!.offsetHeight;
+        const wide = window.matchMedia("(min-width: 1024px)").matches;
+
+        const get = (sel: string) =>
+          box(root!.querySelector(sel), wrapRect);
+
+        const finish = get("[data-route-anchor='finish']");
+        if (!finish) return null;
+
+        const pts: Pt[] = [];
+        const pinPoints: Pt[] = [];
+
+        if (wide) {
+          const map = get("[data-route-anchor='map']");
+          const laneRight = get("[data-lane='right']");
+          const laneLeft = get("[data-lane='left']");
+          const grid = get("[data-course-grid]");
+          if (!map || !laneRight || !laneLeft || !grid) return null;
+
+          const project = mapProjector(map);
+
+          // 1. The hero, following the drawn primary road.
+          const hero = ROUTE_PTS.slice(0, -1).map(project);
+          pts.push(...hero);
+          HERO_PINS.forEach((p) => pinPoints.push(project([p.x, p.y])));
+
+          const exit = hero[hero.length - 1];
+          const xRight = laneRight.cx;
+          const xLeft = laneLeft.cx;
+
+          // 2. Down the right-hand lane, past the three stages.
+          pts.push([exit[0], map.bottom + 56]);
+          pts.push([xRight, map.bottom + 56]);
+          pts.push([xRight, grid.top - 60]);
+
+          // 3. Across to the left of the cards, above them all.
+          pts.push([xLeft, grid.top - 60]);
+
+          // 4. Weave down through the gutters between the cards. Each
+          //    horizontal run sits clear of the card it passes.
+          const rects = cards
+            .map((c) => box(c, wrapRect))
+            .filter((b): b is Box => Boolean(b));
+
+          if (rects.length === 3) {
+            const [c1, c2, c3] = rects;
+            const g1 = (c1.right + c2.left) / 2;
+            const g2 = (c2.right + c3.left) / 2;
+            const yA = c1.bottom + 34;
+            const yB = c2.bottom + 34;
+            const yC = c3.bottom + 34;
+
+            pts.push([xLeft, yA]);
+            pts.push([g1, yA]);
+            pts.push([g1, yB]);
+            pts.push([g2, yB]);
+            pts.push([g2, yC]);
+            pts.push([xRight, yC]);
+          } else {
+            pts.push([xLeft, grid.bottom + 40]);
+            pts.push([xRight, grid.bottom + 40]);
+          }
+
+          // 5. Down and across to the destination marker.
+          pts.push([xRight, finish.cy]);
+          pts.push([finish.cx, finish.cy]);
+        } else {
+          // Small screens: one reserved gutter down the left-hand side, with
+          // a short jog beside each card. Never over the content.
+          const lane = get("[data-lane='left']");
+          const laneX = lane ? lane.cx : 24;
+          const grid = get("[data-course-grid]");
+
+          pts.push([laneX, -40]);
+
+          const rects = cards
+            .map((c) => box(c, wrapRect))
+            .filter((b): b is Box => Boolean(b));
+
+          rects.forEach((c) => {
+            // A small bend as the dot draws level with each card. It stays
+            // inside the reserved gutter, so it never reaches the card.
+            pts.push([laneX - 6, c.top + c.h * 0.3]);
+            pts.push([laneX + 6, c.top + c.h * 0.5]);
+            pts.push([laneX - 6, c.top + c.h * 0.7]);
+          });
+
+          if (grid) pts.push([laneX, grid.bottom + 40]);
+          pts.push([laneX, finish.cy]);
+          pts.push([finish.cx, finish.cy]);
+        }
+
+        const clean = tidy(pts);
+        const d = roundedPath(clean, wide ? CORNER : 12);
+
+        svg!.setAttribute("viewBox", `0 0 ${W} ${H}`);
+        base!.setAttribute("d", d);
+        done!.setAttribute("d", d);
+
+        finishMark!.setAttribute(
+          "transform",
+          `translate(${round(finish.cx)} ${round(finish.cy)})`,
+        );
+
+        // Pins only exist on the wide layout.
+        pins.forEach((pin, i) => {
+          const p = pinPoints[i];
+          pin.dataset.placed = p ? "1" : "0";
+          if (!p) {
+            pin.setAttribute("opacity", "0");
+            return;
+          }
+          pin.setAttribute("transform", `translate(${round(p[0])} ${round(p[1])})`);
+        });
+
+        return true;
+      }
+
+      /** Fraction along the path closest to a given point. */
+      function fractionNear(path: SVGPathElement, x: number, y: number) {
+        const total = path.getTotalLength();
+        let best = 0;
+        let bestD = Infinity;
+        const steps = 400;
+        for (let i = 0; i <= steps; i += 1) {
+          const f = i / steps;
+          const p = path.getPointAtLength(total * f);
+          const dd = (p.x - x) ** 2 + (p.y - y) ** 2;
+          if (dd < bestD) {
+            bestD = dd;
+            best = f;
+          }
+        }
+        return best;
+      }
+
+      const mm = gsap.matchMedia();
+
+      // ---- reduced motion: the whole route, dot parked at the destination --
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        const draw = () => {
+          if (!buildRoute()) return;
+          const total = base.getTotalLength();
+          gsap.set(done, { strokeDasharray: total, strokeDashoffset: 0 });
+          const end = base.getPointAtLength(total);
+          gsap.set(dot, { x: end.x, y: end.y, opacity: 1 });
+          gsap.set(finishMark, { opacity: 1 });
+          pins.forEach((p) => {
+            if (p.dataset.placed === "1") gsap.set(p, { opacity: 1 });
+          });
+          cards.forEach((c) => {
+            c.dataset.passed = "true";
+          });
+        };
+
+        draw();
+
+        // Same story as the animated branch: the route is layout-derived, so
+        // it has to be redrawn whenever the layout settles or changes.
+        let pending = 0;
+        const redraw = () => {
+          window.clearTimeout(pending);
+          pending = window.setTimeout(draw, 120);
+        };
+        const observer = new ResizeObserver(redraw);
+        observer.observe(root);
+        window.addEventListener("resize", redraw);
+        document.fonts?.ready.then(redraw);
+
+        return () => {
+          window.clearTimeout(pending);
+          observer.disconnect();
+          window.removeEventListener("resize", redraw);
+        };
+      });
+
+      // ---- scroll-linked -------------------------------------------------
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        let cardStops: number[] = [];
+        let pinStops: number[] = [];
+
+        const layout = () => {
+          const built = buildRoute();
+          if (!built) return;
+
+          const total = base.getTotalLength();
+          gsap.set(done, { strokeDasharray: total });
+
+          const wrapRect = root.getBoundingClientRect();
+          cardStops = cards.map((c) => {
+            const b = box(c, wrapRect)!;
+            // The point on the route level with the middle of the card.
+            return fractionNear(base, b.cx, b.cy);
+          });
+          pinStops = pins.map((pin) => {
+            const t = pin.getAttribute("transform") ?? "";
+            const m = /translate\(([-\d.]+) ([-\d.]+)\)/.exec(t);
+            if (!m) return 2;
+            return fractionNear(base, Number(m[1]), Number(m[2]));
+          });
+        };
+
+        layout();
+
+        const state = { p: 0 };
+
+        const render = () => {
+          const total = base.getTotalLength();
+          const at = Math.min(1, Math.max(0, state.p));
+          const point = base.getPointAtLength(total * at);
+          gsap.set(dot, { x: point.x, y: point.y });
+          gsap.set(done, { strokeDashoffset: total * (1 - at) });
+
+          cards.forEach((card, i) => {
+            const passed = at >= (cardStops[i] ?? 2) - 0.005;
+            const next = passed ? "true" : "false";
+            if (card.dataset.passed !== next) card.dataset.passed = next;
+          });
+          pins.forEach((pin, i) => {
+            if (pin.dataset.placed !== "1") return;
+            gsap.set(pin, { opacity: at >= (pinStops[i] ?? 2) ? 1 : 0.28 });
+          });
+          gsap.set(finishMark, { opacity: at > 0.985 ? 1 : 0.5 });
+        };
+
+        render();
+
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            // Tied to reading position: the dot sits level with whatever is
+            // in the middle of the viewport, and lands on the destination
+            // marker exactly as that marker reaches the middle.
+            trigger: root,
+            start: "top center",
+            endTrigger: "[data-route-anchor='finish']",
+            end: "center center",
+            scrub: 0.55,
+            invalidateOnRefresh: true,
+            onRefresh: () => {
+              layout();
+              render();
+            },
+          },
+        });
+
+        tl.fromTo(state, { p: 0 }, { p: 1, duration: 1, onUpdate: render }, 0);
+
+        // Anything that changes the page height moves every anchor the route
+        // is built from: viewport resize, webfonts swapping in, an accordion
+        // opening. A ResizeObserver catches all of them.
+        let pending = 0;
+        const refresh = () => {
+          window.clearTimeout(pending);
+          pending = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+        };
+
+        const observer = new ResizeObserver(refresh);
+        observer.observe(root);
+        window.addEventListener("resize", refresh);
+        document.fonts?.ready.then(refresh);
+
+        return () => {
+          window.clearTimeout(pending);
+          observer.disconnect();
+          window.removeEventListener("resize", refresh);
+        };
+      });
+
+      return () => mm.revert();
+    },
+    { scope: wrap },
+  );
+
+  return (
+    <div ref={wrap} data-journey className="relative">
+      <svg
+        data-route-svg
+        className="pointer-events-none absolute inset-0 z-10 h-full w-full"
+        aria-hidden="true"
+        focusable="false"
+        preserveAspectRatio="none"
+      >
+        <path
+          data-route="base"
+          fill="none"
+          stroke="#e52222"
+          strokeOpacity="0.28"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeDasharray="7 7"
+        />
+        <path
+          data-route="done"
+          fill="none"
+          stroke="#e52222"
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        {/* Labelled stops on the hero map. Decorative: the same three points
+            are written out as real text beside the headline. */}
+        {HERO_PINS.map((pin) => (
+          <g key={pin.id} data-route-pin opacity="0.25">
+            <circle r="5.5" fill="#e52222" />
+            <circle r="2" fill="#ffffff" />
+            <g transform="translate(14 -13)">
+              <rect
+                width={pin.label.length * 7.1 + 22}
+                height="26"
+                rx="7"
+                fill="#ffffff"
+                stroke="#e3e2db"
+              />
+              <text
+                x="11"
+                y="17.5"
+                fontSize="12.5"
+                fontWeight="500"
+                fill="#111111"
+                fontFamily="var(--font-jakarta), system-ui, sans-serif"
+              >
+                {pin.label}
+              </text>
+            </g>
+          </g>
+        ))}
+
+        {/* Destination */}
+        <g data-destination opacity="0.5">
+          <circle r="17" fill="#e52222" fillOpacity="0.1" />
+          <path
+            d="M0 4c-5.4-7.6-8-11-8-15.4A8 8 0 1 1 8-11.4C8-7 5.4-3.6 0 4Z"
+            fill="#e52222"
+          />
+          <circle cy="-11.4" r="3" fill="#ffffff" />
+        </g>
+
+        {/* The single moving GPS dot. */}
+        <g data-gps-dot>
+          <circle r="14" fill="#e52222" fillOpacity="0.12" />
+          <circle r="7.5" fill="#ffffff" />
+          <circle r="5" fill="#e52222" />
+        </g>
+      </svg>
+
+      {children}
+    </div>
+  );
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Student Name",
+    "photo": "/assets/testimonials/placeholder-1.png",
+    "rating": 5,
+    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+  },
+  {
+    "name": "Student Name",
+    "photo": "/assets/testimonials/placeholder-2.png",
+    "rating": 5,
+    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+  },
+  {
+    "name": "Student Name",
+    "photo": "/assets/testimonials/placeholder-3.png",
+    "rating": 5,
+    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+  },
+  {
+    "name": "Student Name",
+    "photo": "/assets/testimonials/placeholder-4.png",
+    "rating": 5,
+    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+  },
+  {
+    "name": "Student Name",
+    "photo": "/assets/testimonials/placeholder-5.png",
+    "rating": 5,
+    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+  },
+  {
+    "name": "Student Name",
+    "photo": "/assets/testimonials/placeholder-6.png",
+    "rating": 5,
+    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+  }
+]
