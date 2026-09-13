@@ -30,6 +30,8 @@ const SHOTS = [
   ["booking-mobile", 390, 844, "#book", -40],
   ["reviews-desktop", 1440, 900, "#reviews", -90],
   ["reviews-mobile", 390, 844, "#reviews", -70],
+  ["instructor-desktop", 1440, 900, "#instructor", -90],
+  ["how-desktop", 1440, 900, "#how", -90],
 ];
 
 mkdirSync(OUT, { recursive: true });
@@ -132,6 +134,10 @@ for (const [name, width, height, target, offset = 0] of SHOTS) {
     // Let the scrubbed timeline catch up.
     await sleep(1500);
   }
+
+  // Section reveals are timelines; a capture mid-flight catches half-masked
+  // headings. The longest of them runs well under two seconds.
+  await sleep(2000);
 
   const shot = await send("Page.captureScreenshot", {
     format: "png",

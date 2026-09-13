@@ -154,6 +154,9 @@ const CHECK = (shotDataUrl) => `(async () => {
       text: el.textContent.trim().slice(0, 30),
       ratio: +ratioC.toFixed(2),
       need,
+      bg: +bg.toFixed(3),
+      fg: +tl.toFixed(3),
+      box: [x0, y0, w, h],
       pass: ratioC >= need,
     });
   }
@@ -166,7 +169,10 @@ for (const width of WIDTHS) {
     width,
     height: 860,
     deviceScaleFactor: 2,
-    mobile: true,
+    // Layout-only emulation. With `mobile: true` Chrome scales the visual
+    // viewport against the page's viewport meta, so the screenshot and the
+    // element rects no longer share a coordinate space.
+    mobile: false,
   });
   await send("Page.navigate", { url: BASE });
   await sleep(2500);
@@ -198,7 +204,9 @@ for (const width of WIDTHS) {
       `, min ratio ${Math.min(...judged.map((r) => r.ratio)).toFixed(2)}`,
   );
   bad.forEach((r) =>
-    console.log(`        ${r.ratio} (needs ${r.need}) — "${r.text}"`),
+    console.log(
+      `        ${r.ratio} (needs ${r.need}) — "${r.text}" bg=${r.bg} fg=${r.fg} box=${r.box}`,
+    ),
   );
 }
 

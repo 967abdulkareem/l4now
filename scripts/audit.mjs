@@ -106,7 +106,10 @@ const CHECK = `(() => {
         hits.add(
           b.e.tagName +
             ":" +
-            (b.e.textContent.trim().slice(0, 24) || b.e.name || b.e.type || ""),
+            (b.e.textContent.trim().slice(0, 20) || b.e.name || b.e.type || "") +
+            " @route(" + Math.round(p.x) + "," + Math.round(p.y) +
+            ") box(" + Math.round(b.l) + "," + Math.round(b.t) + "-" +
+            Math.round(b.r) + "," + Math.round(b.b) + ")",
         );
   }
   return {

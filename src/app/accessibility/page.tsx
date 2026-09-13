@@ -55,7 +55,12 @@ export default function Accessibility() {
       <h2>Telling us about a problem</h2>
       <p>
         If something on this site is hard to use, email{" "}
-        <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a> or ring{" "}
+        {site.contact.email ? (
+          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+        ) : (
+          <strong>TODO_EMAIL</strong>
+        )}{" "}
+        or ring{" "}
         <a href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a> and we
         will fix it or give you the information another way.
       </p>

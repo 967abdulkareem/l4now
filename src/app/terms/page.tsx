@@ -68,7 +68,12 @@ export default function Terms() {
 
       <h2>Complaints</h2>
       <p>
-        Tell us first — <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>{" "}
+        Tell us first —{" "}
+        {site.contact.email ? (
+          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+        ) : (
+          <strong>TODO_EMAIL</strong>
+        )}{" "}
         or <a href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a>. If
         we cannot resolve it, complaints about an approved driving instructor
         can be raised with the DVSA.

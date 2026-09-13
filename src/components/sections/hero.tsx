@@ -10,23 +10,27 @@ export function Hero() {
   return (
     <section className="relative">
       {/* ── The town, behind everything ────────────────────────────────────
-          Wide screens: it sits beside the copy, at full strength.
-          Narrow screens: the same vector map sits *behind* the copy, cropped
-          to a portrait window and heavily scrimmed so body text stays
-          legible. The red route and its pins keep full strength either way —
-          they are the focal element, and the crop places them below the
-          copy so they never sit under text. */}
+          Wide screens: it sits beside the copy at full strength, with the
+          route and its labelled stops drawn over it.
+
+          Phones: the artwork alone — streets, blocks, greens, water. No
+          route, no pins, no labels: at portrait width they landed in the
+          content column and fought the copy. The three trust signals below
+          carry what the pins were saying, and the hanging red line keeps the
+          brand's through-line. */}
       <div
         data-route-anchor="map"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 lg:inset-y-0 lg:left-auto lg:right-0 lg:z-auto lg:w-[62%]"
+        className="pointer-events-none absolute inset-0 -z-10 lg:inset-y-0 lg:right-0 lg:left-auto lg:z-auto lg:w-[62%]"
       >
-        {/* Phones: a portrait crop, positioned so the route sits below the
-            copy rather than through it. */}
+        {/* Phones: a dense residential crop, chosen because it reads as even
+            texture at portrait width — no park or water mass sits behind the
+            headline. */}
         <MapArt
+          route={false}
           className="absolute inset-0 h-full w-full opacity-60 md:hidden"
-          viewBox="0 -1430 1100 2400"
-          preserveAspectRatio="xMidYMax slice"
+          viewBox="150 240 620 1120"
+          preserveAspectRatio="xMidYMid slice"
         />
         {/* Tablets up: the desktop framing — full-bleed behind the copy until
             there is room to put it beside the copy. */}
@@ -43,22 +47,35 @@ export function Hero() {
 
       <div className="shell relative">
         <Lanes>
-          <div className="flex max-w-[36rem] flex-col pt-32 pb-[46vh] sm:pt-36 sm:pb-[42vh] lg:min-h-[92svh] lg:justify-center lg:pt-28 lg:pb-20">
-            <p className="mb-5 text-[0.8rem] font-bold tracking-[0.2em] text-brand uppercase">
+          <div className="flex max-w-[36rem] flex-col pt-[calc(var(--header-h)+2.5rem)] pb-20 lg:min-h-[82svh] lg:justify-center lg:pt-[calc(var(--header-h)+1rem)] lg:pb-16">
+            <p
+              data-hero-line
+              className="mb-5 text-[0.8rem] font-bold tracking-[0.2em] text-brand uppercase"
+            >
               {site.tagline}
             </p>
-            <h1 className="display text-[clamp(2.6rem,6.4vw,4.4rem)]">
+
+            <h1
+              data-hero-heading
+              className="display text-[clamp(2.6rem,6.4vw,4.4rem)]"
+            >
               Learn to drive.
               <br />
               <span className="text-brand">Feel in control.</span>
             </h1>
 
-            <p className="mt-7 max-w-[30rem] text-[1.08rem] leading-[1.6] text-ink-soft sm:text-[1.18rem]">
+            <p
+              data-hero-line
+              className="mt-7 max-w-[30rem] text-[1.08rem] leading-[1.6] text-ink-soft sm:text-[1.18rem]"
+            >
               Patient, practical driving lessons. Progress at your pace, from
               your first turn to test day.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div
+              data-hero-line
+              className="mt-9 flex flex-wrap items-center gap-3"
+            >
               <a href="#book" className="btn-primary">
                 Find your lesson
               </a>
@@ -67,14 +84,15 @@ export function Hero() {
               </a>
             </div>
 
-            {/* Facts, not a restatement of the journey — that is what the map
-                pins and "How it works" are for. */}
+            {/* Facts, not a restatement of the journey — that is what "How it
+                works" is for. On phones these carry what the map pins said. */}
             <ul className="mt-11 flex flex-wrap gap-x-7 gap-y-3 border-t border-hairline pt-6">
               {site.trustSignals.map((signal, i) => {
                 const Icon = TRUST_ICONS[i];
                 return (
                   <li
                     key={signal}
+                    data-hero-line
                     className="flex items-center gap-2 text-[0.92rem] font-semibold text-ink"
                   >
                     <Icon

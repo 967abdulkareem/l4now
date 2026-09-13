@@ -12,6 +12,8 @@
  *   public/favicon-180.png   transparent, apple-touch-icon
  *   public/favicon-512.png   composited on a WHITE SQUARE — the source is too
  *                            wide and too small to crop into a crisp square
+ *   public/logo-header.png   the mark with the strapline band cropped off,
+ *                            which is illegible at header size
  *   public/og.png            1200x630 white canvas, logo centred
  *   public/assets/testimonials/placeholder-1..6.svg
  *                            initials-on-colour avatars (written directly,
@@ -30,21 +32,24 @@ const CHROME =
 /* ---------------------------------------------------------- avatars ------ */
 /* Plain SVG files — no browser, no external requests. */
 
-const AVATAR_COLOURS = [
-  "#e52222",
-  "#111111",
-  "#6b6b6b",
-  "#b81212",
-  "#3a3a3a",
-  "#8d8d8d",
+/* Deliberately quiet greys: a placeholder should hold the shape of a photo
+   without competing with the brand's red. */
+const AVATAR_TONES = [
+  ["#e9e7e3", "#b4aea6"],
+  ["#e6e8e9", "#adb3b6"],
+  ["#eae8e4", "#b7b0a7"],
+  ["#e7e9e7", "#aeb5af"],
+  ["#ebe8e6", "#b9b1ab"],
+  ["#e6e7ea", "#aeb2b9"],
 ];
 
 mkdirSync("public/assets/testimonials", { recursive: true });
 
-AVATAR_COLOURS.forEach((colour, i) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Student photo placeholder">
-  <rect width="160" height="160" fill="${colour}"/>
-  <text x="80" y="80" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="58" font-weight="600" text-anchor="middle" dominant-baseline="central">SN</text>
+AVATAR_TONES.forEach(([bg, fg], i) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" width="480" height="600" role="img" aria-label="Student photo placeholder">
+  <rect width="480" height="600" fill="${bg}"/>
+  <circle cx="240" cy="236" r="76" fill="${fg}"/>
+  <path d="M96 520c0-84 64-140 144-140s144 56 144 140v80H96Z" fill="${fg}"/>
 </svg>
 `;
   writeFileSync(`public/assets/testimonials/placeholder-${i + 1}.svg`, svg);
@@ -161,6 +166,20 @@ const script = `(async () => {
     ctx.fillRect(0, 0, 512, 512);
     draw(ctx, 512, 512, 44);
     out["favicon-512.png"] = c.toDataURL("image/png").split(",")[1];
+  }
+
+  // Header variant: the strapline band at the foot of the logo is illegible
+  // at header size and reads as noise, so it is cropped off. The full logo,
+  // strapline included, still goes in the footer.
+  {
+    const keep = Math.round(th * 0.845);
+    const scale = 2;
+    const c = document.createElement("canvas");
+    c.width = Math.round(tw * scale); c.height = Math.round(keep * scale);
+    const ctx = c.getContext("2d");
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(probe, minX, minY, tw, keep, 0, 0, c.width, c.height);
+    out["logo-header.png"] = c.toDataURL("image/png").split(",")[1];
   }
 
   // Social card: 1200x630 white, logo centred.

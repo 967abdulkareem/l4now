@@ -49,6 +49,45 @@ const LABELS: Record<keyof Fields, string> = {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+/* ── Dates are entered day-first ──────────────────────────────────────────
+   `<input type="date">` renders in the *browser's* locale, not the page's,
+   so a UK learner on a US-configured machine is shown mm/dd/yyyy and books
+   the wrong month. This is a plain text field that only ever accepts
+   dd/mm/yyyy, and echoes the date back in full underneath so there is
+   nothing left to misread. */
+
+/** dd/mm/yyyy -> yyyy-mm-dd, or "" if it is not a real date. */
+function parseUkDate(input: string) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(input.trim());
+  if (!m) return "";
+  const [, dd, mm, yyyy] = m;
+  const iso = `${yyyy}-${mm}-${dd}`;
+  const d = new Date(`${iso}T00:00:00`);
+  // Rejects 31/02 and friends, which Date would otherwise roll forward.
+  if (
+    Number.isNaN(d.getTime()) ||
+    d.getDate() !== Number(dd) ||
+    d.getMonth() + 1 !== Number(mm)
+  ) {
+    return "";
+  }
+  return iso;
+}
+
+/** Inserts the slashes as the visitor types, and never more than 8 digits. */
+function formatUkDate(input: string) {
+  const digits = input.replace(/\D/g, "").slice(0, 8);
+  const parts = [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)];
+  return parts.filter(Boolean).join("/");
+}
+
+const LONG_DATE = new Intl.DateTimeFormat("en-GB", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
 function validate(values: Fields): Errors {
   const errors: Errors = {};
 
@@ -59,8 +98,11 @@ function validate(values: Fields): Errors {
     errors.phone = "Enter a phone number we can reach you on.";
   }
 
-  if (!values.date) errors.date = "Choose a date.";
-  else if (values.date < today()) {
+  if (!values.date.trim()) {
+    errors.date = "Enter a date, as dd/mm/yyyy.";
+  } else if (!parseUkDate(values.date)) {
+    errors.date = "That is not a date. Use dd/mm/yyyy, for example 06/03/2027.";
+  } else if (parseUkDate(values.date) < today()) {
     errors.date = "Choose today or a date in the future.";
   }
 
@@ -72,13 +114,19 @@ function validate(values: Fields): Errors {
 
 /** The text that lands in WhatsApp, ready for the visitor to send. */
 function composeMessage(v: Fields) {
+  const iso = parseUkDate(v.date);
+  // Spelled out, so the month can never be read the wrong way round.
+  const when = iso
+    ? LONG_DATE.format(new Date(`${iso}T00:00:00`))
+    : v.date;
+
   const lines = [
     `Hello ${site.name} — I would like to book a lesson.`,
     "",
     `Name: ${v.name.trim()}`,
     `Phone: ${v.phone.trim()}`,
     `Lesson type: ${v.lessonType}`,
-    `Preferred date: ${v.date}`,
+    `Preferred date: ${when}`,
     `Preferred time: ${v.time}`,
   ];
   if (v.message.trim()) lines.push("", `Notes: ${v.message.trim()}`);
@@ -174,6 +222,11 @@ export function BookingForm() {
     );
   }
 
+  const isoDate = parseUkDate(values.date);
+  const longDate = isoDate
+    ? LONG_DATE.format(new Date(`${isoDate}T00:00:00`))
+    : "";
+
   const invalid = FIELD_ORDER.filter((f) => errors[f]);
 
   return (
@@ -251,14 +304,32 @@ export function BookingForm() {
             data-field="date"
             id={id("date")}
             name="date"
-            type="date"
-            min={today()}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="dd/mm/yyyy"
+            maxLength={10}
             value={values.date}
-            onChange={(e) => set("date", e.target.value)}
+            onChange={(e) => set("date", formatUkDate(e.target.value))}
             aria-invalid={Boolean(errors.date)}
-            aria-describedby={errors.date ? errorId("date") : undefined}
+            aria-describedby={
+              errors.date
+                ? errorId("date")
+                : longDate
+                  ? `${id("date")}-echo`
+                  : undefined
+            }
             className={control(Boolean(errors.date))}
           />
+          {longDate && !errors.date && (
+            <p
+              id={`${id("date")}-echo`}
+              className="mt-2 text-[0.83rem] text-muted-foreground"
+            >
+              {longDate}
+            </p>
+          )}
         </Field>
 
         <Field

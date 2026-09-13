@@ -1,249 +1,293 @@
 "use client";
 
-import { Star } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Pause, Play, Star } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import testimonials from "@data/testimonials.json";
+import { MOTION, gsap, useGSAP } from "@/lib/gsap";
 import { site } from "@/lib/site";
 
-/**
- * Square photo tiles.
- *
- * Pointer devices reveal the quote as an overlay on hover/focus — revealing it
- * *below* would reflow the grid every time the cursor crossed a tile, so the
- * layout would jump under the mouse. Touch devices instead open a panel that
- * spans the full row beneath the tapped tile's row, so a two-column grid does
- * not tear apart.
- *
- * The quote is in the DOM and exposed to assistive technology in both states.
- */
 type Testimonial = {
   name: string;
   photo?: string;
   quote: string;
   rating?: number;
+  passedDate?: string;
 };
-
-/** Keeps a long quote from overflowing its tile. */
-const MAX_QUOTE = 170;
-
-/** Columns in the touch layout, which is the only one that opens a panel. */
-const TOUCH_COLUMNS = 2;
-
-const trim = (text: string) =>
-  text.length > MAX_QUOTE ? `${text.slice(0, MAX_QUOTE).trimEnd()}…` : text;
 
 const items = testimonials as Testimonial[];
 
-/**
- * True on devices that can hover with a fine pointer. Decided in JS rather
- * than CSS so the two behaviours are mutually exclusive and testable — and so
- * a touchscreen laptop gets the tap panel regardless of how wide it is.
- */
-function useCanHover() {
-  const [canHover, setCanHover] = useState(false);
+/** Long enough to read two sentences without hurrying. */
+const INTERVAL = 6500;
 
+/** Swipe distance, in px, before it counts as a deliberate gesture. */
+const SWIPE = 45;
+
+export function Testimonials() {
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [held, setHeld] = useState(false);
+  const [reduced, setReduced] = useState(false);
+
+  const scope = useRef<HTMLDivElement>(null);
+  const photoRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const touchX = useRef<number | null>(null);
+  const first = useRef(true);
+
+  const count = items.length;
+  const go = useCallback(
+    (next: number) => setIndex(((next % count) + count) % count),
+    [count],
+  );
+
+  // Autoplay is off by default when the visitor asks for reduced motion.
   useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const sync = () => setCanHover(mq.matches);
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      setReduced(mq.matches);
+      if (mq.matches) setPlaying(false);
+    };
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  return canHover;
-}
+  // The timer. Paused while the visitor is hovering, focused inside, or has
+  // pressed pause — WCAG 2.2.2 wants all three to be possible.
+  useEffect(() => {
+    if (!playing || held) return;
+    const id = window.setInterval(() => go(index + 1), INTERVAL);
+    return () => window.clearInterval(id);
+  }, [playing, held, index, go]);
 
-export function Testimonials() {
-  const [open, setOpen] = useState<number | null>(null);
-  const panelRef = useRef<HTMLLIElement>(null);
-  const canHover = useCanHover();
+  // Keep the next image warm so advancing never shows a blank frame.
+  useEffect(() => {
+    const next = items[(index + 1) % count]?.photo;
+    if (!next) return;
+    const img = new Image();
+    img.src = next;
+  }, [index, count]);
 
-  const toggle = (index: number) => {
-    const next = open === index ? null : index;
-    setOpen(next);
-    if (next === null) return;
-    // `block: "nearest"` scrolls only if the panel would sit off-screen, so an
-    // already-visible quote does not yank the page around.
-    requestAnimationFrame(() =>
-      panelRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      }),
-    );
+  // The slide change itself: photo and card arrive together but offset, so it
+  // reads as choreography rather than a cut.
+  useGSAP(
+    () => {
+      if (first.current) {
+        first.current = false;
+        return;
+      }
+      const targets = [photoRef.current, cardRef.current].filter(Boolean);
+      if (!targets.length) return;
+
+      if (reduced) {
+        gsap.fromTo(targets, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 });
+        return;
+      }
+
+      gsap
+        .timeline({ defaults: { ease: MOTION.ease } })
+        .fromTo(
+          photoRef.current,
+          { autoAlpha: 0, xPercent: 3 },
+          { autoAlpha: 1, xPercent: 0, duration: 0.55 },
+          0,
+        )
+        .fromTo(
+          cardRef.current,
+          { autoAlpha: 0, y: 14 },
+          { autoAlpha: 1, y: 0, duration: 0.55 },
+          0.1,
+        );
+    },
+    { dependencies: [index], scope },
+  );
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      go(index - 1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      go(index + 1);
+    }
   };
 
-  // The panel goes after the last tile of the open tile's row, so it spans the
-  // full width without splitting the grid.
-  const panelAfter =
-    open === null || canHover
-      ? -1
-      : Math.min(
-          Math.floor(open / TOUCH_COLUMNS) * TOUCH_COLUMNS +
-            (TOUCH_COLUMNS - 1),
-          items.length - 1,
-        );
+  const current = items[index];
 
   return (
     <section
       id="reviews"
-      className="scroll-mt-24 border-t border-hairline py-16 lg:py-24"
+      data-section="reviews"
+      className="section-y border-t border-hairline"
     >
-      <div className="shell">
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-5">
-            <p className="eyebrow" data-reveal>
+      <div className="shell" ref={scope}>
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-12">
+          <div className="lg:col-span-6">
+            <p data-anim-line className="eyebrow">
               Reviews
             </p>
             <h2
+              data-anim-heading
               className="display mt-3 text-[clamp(1.9rem,4vw,2.7rem)]"
-              data-reveal
             >
               What our students say.
             </h2>
           </div>
           <p
-            className="max-w-[34rem] text-[1.02rem] leading-[1.6] text-ink-soft lg:col-span-6 lg:col-start-7 lg:self-end"
-            data-reveal
+            data-anim-line
+            className="max-w-[30rem] text-[1.02rem] leading-[1.6] text-ink-soft lg:col-span-5 lg:col-start-8"
           >
-            Passed with {site.shortName}? Send us a line on WhatsApp and we will
-            add it here.
+            Passed with {site.shortName}? Send us a line on WhatsApp and we
+            will add it here.
           </p>
         </div>
 
         {/* TODO: replace with real photos + quotes in /data/testimonials.json */}
-        <ul className="mt-12 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3">
-          {items.map((item, i) => (
-            <Tile
-              key={`${item.name}-${i}`}
-              item={item}
-              index={i}
-              isOpen={open === i}
-              canHover={canHover}
-              onToggle={() => toggle(i)}
-              trailing={
-                i === panelAfter && open !== null ? (
-                  <li
-                    ref={panelRef}
-                    id={`review-panel-${open}`}
-                    data-quote-panel
-                    className="col-span-2 rounded-2xl border border-hairline bg-white p-5"
-                  >
-                    <p className="text-[1rem] leading-[1.62] text-ink-soft">
-                      &ldquo;{trim(items[open].quote)}&rdquo;
-                    </p>
-                    <p className="mt-3 text-[0.88rem] font-semibold text-ink">
-                      {items[open].name}
-                    </p>
-                  </li>
-                ) : null
-              }
-            />
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-function Tile({
-  item,
-  index,
-  isOpen,
-  canHover,
-  onToggle,
-  trailing,
-}: {
-  item: Testimonial;
-  index: number;
-  isOpen: boolean;
-  canHover: boolean;
-  onToggle: () => void;
-  trailing: React.ReactNode;
-}) {
-  const photo = item.photo ?? "/assets/testimonials/placeholder-1.svg";
-  // Held in state rather than left to a CSS hover variant, so the reveal is
-  // explicit and behaves identically for mouse and keyboard.
-  const [active, setActive] = useState(false);
-
-  return (
-    <>
-      <li
-        data-tile
-        style={{ ["--tile-delay" as string]: `${(index % 3) * 60}ms` }}
-        className="group"
-      >
-        <button
-          type="button"
-          onClick={onToggle}
-          onMouseEnter={() => setActive(true)}
-          onMouseLeave={() => setActive(false)}
-          onFocus={() => setActive(true)}
-          onBlur={() => setActive(false)}
-          aria-expanded={isOpen}
-          aria-controls={`review-panel-${index}`}
-          className="relative block aspect-square w-full overflow-hidden rounded-2xl border border-hairline bg-muted text-left"
+        <div
+          data-anim-item
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Student reviews"
+          tabIndex={-1}
+          onKeyDown={onKeyDown}
+          onMouseEnter={() => setHeld(true)}
+          onMouseLeave={() => setHeld(false)}
+          onFocusCapture={() => setHeld(true)}
+          onBlurCapture={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+              setHeld(false);
+            }
+          }}
+          onTouchStart={(e) => {
+            touchX.current = e.touches[0].clientX;
+          }}
+          onTouchEnd={(e) => {
+            if (touchX.current === null) return;
+            const dx = e.changedTouches[0].clientX - touchX.current;
+            if (Math.abs(dx) > SWIPE) go(index + (dx < 0 ? 1 : -1));
+            touchX.current = null;
+          }}
+          className="mt-12"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- static
-              export has no optimiser; photos are swapped by hand in the JSON. */}
-          <img
-            src={photo}
-            alt=""
-            width={480}
-            height={480}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 size-full object-cover"
-          />
+          {/* Fixed height, so a long quote never resizes the carousel. */}
+          <div className="grid gap-5 sm:gap-6 lg:grid-cols-12 lg:items-stretch">
+            <div
+              ref={photoRef}
+              className="relative overflow-hidden rounded-2xl border border-hairline bg-muted lg:col-span-5 lg:h-[23rem]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- static
+                  export; photos are swapped by hand in the JSON. */}
+              <img
+                key={current.photo}
+                src={current.photo ?? "/assets/testimonials/placeholder-1.svg"}
+                alt=""
+                width={480}
+                height={600}
+                decoding="async"
+                className="aspect-4/5 size-full object-cover sm:aspect-video lg:aspect-auto lg:h-full"
+              />
+            </div>
 
-          {/* Name, always visible, over a scrim. */}
-          <span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(to_top,rgba(17,17,17,0.8),rgba(17,17,17,0))] p-3 pt-10">
-            <span className="block text-[0.95rem] font-bold text-white">
-              {item.name}
-            </span>
-            {typeof item.rating === "number" && (
-              <span
-                className="mt-0.5 flex items-center gap-0.5 text-white"
-                role="img"
-                aria-label={`${item.rating} out of 5`}
-              >
-                {Array.from({ length: 5 }, (_, s) => (
-                  <Star
-                    key={s}
-                    aria-hidden="true"
-                    className={`size-3 ${
-                      s < item.rating! ? "fill-current" : "opacity-40"
+            <div
+              ref={cardRef}
+              className="card-surface flex min-h-[17rem] flex-col justify-between p-6 sm:min-h-[15rem] lg:col-span-7 lg:h-[23rem] lg:p-9"
+            >
+              <div>
+                {typeof current.rating === "number" && (
+                  <p
+                    className="flex items-center gap-1 text-brand"
+                    role="img"
+                    aria-label={`${current.rating} out of 5`}
+                  >
+                    {Array.from({ length: 5 }, (_, s) => (
+                      <Star
+                        key={s}
+                        aria-hidden="true"
+                        className={`size-4 ${
+                          s < current.rating! ? "fill-current" : "opacity-25"
+                        }`}
+                      />
+                    ))}
+                  </p>
+                )}
+
+                <blockquote className="mt-5 line-clamp-5 text-[1.08rem] leading-[1.6] text-ink sm:text-[1.2rem] lg:line-clamp-4 lg:text-[1.35rem] lg:leading-[1.5]">
+                  &ldquo;{current.quote}&rdquo;
+                </blockquote>
+              </div>
+
+              <footer className="mt-6 border-t border-hairline pt-5">
+                <p className="text-[1rem] font-bold text-ink">{current.name}</p>
+                {current.passedDate && (
+                  <p className="mt-0.5 text-[0.9rem] text-muted-foreground">
+                    {current.passedDate}
+                  </p>
+                )}
+              </footer>
+            </div>
+          </div>
+
+          {/* Politely announced, so a screen reader hears the change without
+              the whole card being re-read mid-sentence. */}
+          <p aria-live="polite" className="sr-only">
+            Review {index + 1} of {count}: {current.name}
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setPlaying((v) => !v)}
+              aria-label={
+                playing ? "Pause review slideshow" : "Play review slideshow"
+              }
+              className="grid size-10 place-items-center rounded-full border border-ink/12 bg-white text-ink transition-colors hover:border-ink/30"
+            >
+              {playing ? (
+                <Pause className="size-4" aria-hidden="true" />
+              ) : (
+                <Play className="size-4" aria-hidden="true" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => go(index - 1)}
+              aria-label="Previous review"
+              className="grid size-10 place-items-center rounded-full border border-ink/12 bg-white text-ink transition-colors hover:border-ink/30"
+            >
+              <ChevronLeft className="size-4" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => go(index + 1)}
+              aria-label="Next review"
+              className="grid size-10 place-items-center rounded-full border border-ink/12 bg-white text-ink transition-colors hover:border-ink/30"
+            >
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </button>
+
+            <ul className="ml-1 flex items-center gap-2">
+              {items.map((item, i) => (
+                <li key={`${item.name}-${i}`}>
+                  <button
+                    type="button"
+                    onClick={() => go(i)}
+                    aria-label={`Show review ${i + 1} of ${count}`}
+                    aria-current={i === index ? "true" : undefined}
+                    className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${
+                      i === index
+                        ? "w-6 bg-brand"
+                        : "w-2 bg-ink/20 hover:bg-ink/40"
                     }`}
                   />
-                ))}
-              </span>
-            )}
-          </span>
-
-          {/* Pointer devices: the quote covers the photo on hover/focus. No
-              reflow, so the grid never moves under the cursor. */}
-          {canHover && (
-            <span
-              data-quote-overlay
-              aria-hidden="true"
-              className={`pointer-events-none absolute inset-0 flex flex-col justify-center bg-[rgba(17,17,17,0.88)] p-5 transition-opacity duration-300 ${
-                active ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <span className="text-[0.95rem] leading-[1.55] text-white">
-                &ldquo;{trim(item.quote)}&rdquo;
-              </span>
-              <span className="mt-3 text-[0.85rem] font-semibold text-white/75">
-                {item.name}
-              </span>
-            </span>
-          )}
-
-          {/* Readable by a screen reader whatever is shown visually. */}
-          <span className="sr-only">{item.quote}</span>
-        </button>
-      </li>
-      {trailing}
-    </>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

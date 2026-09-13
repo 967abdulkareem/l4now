@@ -34,9 +34,13 @@ export function SiteHeader() {
           : "bg-transparent"
       }`}
     >
-      <div className="shell flex h-[5.75rem] items-center justify-between gap-4 lg:h-[7rem] lg:gap-6">
+      <div className="shell flex h-[var(--header-h)] items-center justify-between gap-4 lg:gap-6">
         <a href="#top" className="flex shrink-0 items-center">
-          <BrandLogo width={150} className="h-auto w-[104px] sm:w-[124px] lg:w-[150px]" />
+          <BrandLogo
+            variant="header"
+            width={190}
+            className="h-auto w-[134px] sm:w-[158px] lg:w-[190px]"
+          />
         </a>
 
         <nav aria-label="Primary" className="hidden lg:block">

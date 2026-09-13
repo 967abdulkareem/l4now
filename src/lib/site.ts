@@ -29,8 +29,12 @@ export const site = {
     // The WhatsApp number itself lives in src/lib/whatsapp.ts.
     phoneDisplay: WHATSAPP_DISPLAY,
     phoneHref: `tel:+${WHATSAPP_NUMBER}`,
-    // TODO: replace with the real business email address.
-    email: "hello@l4now.example",
+    /**
+     * TODO_EMAIL — set this to the real address and the email row appears
+     * everywhere on its own. Left null so nothing publishes a mailto: link
+     * to an address that does not exist.
+     */
+    email: null as string | null,
     address: {
       // TODO: replace with the real address, or delete the block and the
       // footer <address> that renders it.
@@ -140,6 +144,26 @@ export const site = {
       body: "Mock tests, independent driving and manoeuvres worked through until you know you are ready.",
     },
   ],
+
+  /**
+   * Who will actually teach you. For a driving school this is the strongest
+   * trust signal there is — people are choosing a person to sit beside for
+   * hours, not a package.
+   *
+   * All of it is placeholder. Replace every TODO_ below; do not add years of
+   * experience, pass rates or student numbers unless they are real.
+   */
+  instructor: {
+    name: "TODO_INSTRUCTOR_NAME",
+    /** Put a photo in /public/assets/ and point this at it. */
+    photo: null as string | null,
+    photoTodo: "TODO_INSTRUCTOR_PHOTO",
+    credential: "DVSA-approved instructor (ADI)",
+    bio: [
+      "TODO_INSTRUCTOR_BIO — a short paragraph in your own voice. What brought you to instructing, and how you like to teach.",
+      "TODO_INSTRUCTOR_BIO — what a first lesson with you is actually like: where you start, what you cover, and what you will not do.",
+    ],
+  },
 
   faqs: [
     {

@@ -7,7 +7,7 @@ import { site } from "@/lib/site";
 /** The end of the journey: the route arrives, and the panel is waiting. */
 export function Reservation() {
   return (
-    <section id="book" className="scroll-mt-24 py-16 lg:py-24">
+    <section id="book" data-section="booking" className="section-y">
       <div className="shell">
         <Lanes>
           {/* The route's destination marker is centred on this element, and it
@@ -15,18 +15,18 @@ export function Reservation() {
           <span
             data-route-anchor="finish"
             aria-hidden="true"
-            className="mb-12 block size-6"
+            className="mb-4 block size-6"
           />
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-4">
-              <p className="eyebrow" data-reveal>
+              <p data-anim-line className="eyebrow">
                 Next step
               </p>
-              <h2 className="display mt-3 text-[clamp(2rem,4.4vw,2.9rem)]" data-reveal>
+              <h2 data-anim-heading className="display mt-3 text-[clamp(2rem,4.4vw,2.9rem)]">
                 Ready for your next turn?
               </h2>
-              <p className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
+              <p data-anim-line className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
                 Tell us when suits and we will come back with a slot. No
                 deposit, no card details, no obligation.
               </p>
@@ -92,7 +92,7 @@ export function Reservation() {
             </div>
 
             <div className="lg:col-span-8">
-              <div className="card-surface rounded-3xl p-6 sm:p-8 lg:p-10">
+              <div data-anim-item className="card-surface rounded-3xl p-6 sm:p-8 lg:p-10">
                 <h3 className="text-[1.28rem] font-bold tracking-[-0.02em] text-ink sm:text-[1.45rem]">
                   Lesson enquiry
                 </h3>

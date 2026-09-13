@@ -13,17 +13,17 @@ const TRANSMISSION_LABEL = {
 
 export function Pricing() {
   return (
-    <section id="pricing" className="scroll-mt-24 py-16 lg:py-24">
+    <section id="pricing" data-section="pricing" className="section-y">
       <div className="shell">
         <Lanes>
           <div className="max-w-[38rem]">
-            <p className="eyebrow" data-reveal>
+            <p data-anim-line className="eyebrow">
               Lessons &amp; prices
             </p>
-            <h2 className="display mt-3 text-[clamp(2rem,4.4vw,3rem)]" data-reveal>
+            <h2 data-anim-heading className="display mt-3 text-[clamp(2rem,4.4vw,3rem)]">
               What it costs.
             </h2>
-            <p className="mt-4 text-[1.05rem] leading-[1.6] text-ink-soft">
+            <p data-anim-line className="mt-4 text-[1.05rem] leading-[1.6] text-ink-soft">
               Every lesson is with a DVSA-approved instructor (ADI), in a
               dual-controlled car, with pick-up and drop-off included.
             </p>
@@ -32,7 +32,7 @@ export function Pricing() {
           {/* gap-x-14 is the route's gutter, not decoration — keep it. */}
           <ul
             data-course-grid
-            className="mt-24 grid gap-y-12 lg:grid-cols-3 lg:gap-x-14"
+            className="mt-20 grid gap-y-16 lg:grid-cols-3 lg:items-stretch lg:gap-x-14"
           >
             {pricing.map((item, i) => {
               const ask = item.price === TODO_PRICE;
@@ -46,14 +46,15 @@ export function Pricing() {
                   key={item.id}
                   data-course-card
                   data-passed="false"
-                  data-reveal
+                  data-anim-item
+                  data-hover-lift
+                  {...(featured ? { "data-featured": "" } : {})}
                   // The first three cards define the route's weave through the
                   // grid; the rest sit below it.
                   {...(i < 3 ? { "data-route-row": "" } : {})}
-                  style={{ "--reveal-delay": `${(i % 3) * 60}ms` } as React.CSSProperties}
-                  className={`card-surface group relative flex flex-col p-7 transition-[box-shadow,border-color,transform] duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-22px_rgb(17_17_17/0.35)] data-[passed=true]:shadow-[0_14px_34px_-22px_rgb(17_17_17/0.3)] lg:p-8 ${
+                  className={`card-surface group relative flex h-full flex-col p-7 transition-[box-shadow,border-color] duration-300 data-[passed=true]:shadow-[0_14px_34px_-22px_rgb(17_17_17/0.3)] lg:p-8 ${
                     featured ? "border-brand ring-1 ring-brand/25" : ""
-                  } ${i < 3 ? ["lg:mt-0", "lg:mt-16", "lg:mt-32"][i] : ""}`}
+                  }`}
                 >
                   {item.badge && (
                     <span className="absolute -top-3 left-7 rounded-full bg-brand px-3 py-1 text-[0.72rem] font-bold tracking-[0.1em] text-white uppercase lg:left-8">
@@ -68,7 +69,7 @@ export function Pricing() {
                     {item.subtitle}
                   </p>
 
-                  <p className="mt-6 flex flex-wrap items-baseline gap-x-2.5">
+                  <p className="mt-6 flex min-h-[3.2rem] flex-wrap items-baseline gap-x-2.5">
                     {ask ? (
                       <span className="text-[1.35rem] font-bold text-ink">
                         Price on request
@@ -114,7 +115,10 @@ export function Pricing() {
             })}
           </ul>
 
-          <p className="mt-12 max-w-[42rem] text-[0.9rem] text-muted-foreground">
+          <p
+            data-anim-line
+            className="mt-20 max-w-[42rem] text-[0.9rem] text-muted-foreground"
+          >
             {pricingNote}
           </p>
         </Lanes>

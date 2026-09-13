@@ -1,9 +1,10 @@
 import { RouteJourney } from "@/components/journey/route-journey";
-import { Reveal } from "@/components/reveal";
+import { MotionRoot } from "@/components/motion-root";
 import { Pricing } from "@/components/sections/pricing";
 import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
+import { Instructor } from "@/components/sections/instructor";
 import { Reservation } from "@/components/sections/reservation";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { Testimonials } from "@/components/sections/testimonials";
@@ -36,19 +37,21 @@ export default function Home() {
     <>
       <span id="top" />
       <main id="main">
-        {/* Hero, stages, courses and booking share one route and one dot. */}
-        <RouteJourney>
-          <Hero />
-          <HowItWorks />
-          <Pricing />
-          <Reservation />
-        </RouteJourney>
+        <MotionRoot>
+          {/* Hero, stages, pricing and booking share one route and one dot. */}
+          <RouteJourney>
+            <Hero />
+            <HowItWorks />
+            <Instructor />
+            <Pricing />
+            <Reservation />
+          </RouteJourney>
 
-        <Testimonials />
-        <Faq />
+          <Testimonials />
+          <Faq />
+        </MotionRoot>
       </main>
       <SiteFooter />
-      <Reveal />
       <script
         type="application/ld+json"
         // Generated from the site config above; no user input reaches this.

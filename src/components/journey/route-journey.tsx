@@ -48,23 +48,6 @@ function tidy(pts: Pt[]) {
   return out;
 }
 
-/**
- * The narrow-screen crop of the map. Kept in step with the `viewBox` and
- * `preserveAspectRatio` that hero.tsx gives the mobile <MapArt>, so the route
- * lands on the drawn roads there too.
- *
- * `alignY: 1` is xMidYMax — the bottom of the window meets the bottom of the
- * hero, which is what puts the three pins below the copy rather than under it.
- */
-export const MOBILE_MAP_CROP = {
-  x: 0,
-  y: -1430,
-  w: 1100,
-  h: 2400,
-  alignX: 0.5,
-  alignY: 1,
-} as const;
-
 const DESKTOP_MAP_CROP = {
   x: 0,
   y: 0,
@@ -74,7 +57,7 @@ const DESKTOP_MAP_CROP = {
   alignY: 0.5,
 } as const;
 
-type Crop = typeof DESKTOP_MAP_CROP | typeof MOBILE_MAP_CROP;
+type Crop = typeof DESKTOP_MAP_CROP;
 
 /**
  * The map SVG uses `preserveAspectRatio="… slice"`, so design-space points
@@ -182,16 +165,19 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           const xRight = laneRight.cx;
           const xLeft = laneLeft.cx;
 
-          // 2. Down the right-hand lane, past the three stages.
-          pts.push([exit[0], map.bottom + 56]);
-          pts.push([xRight, map.bottom + 56]);
-          pts.push([xRight, grid.top - 60]);
+          // 2. Step across to the right-hand lane while still over the map —
+          //    doing it below the hero would put a horizontal run within a
+          //    few pixels of the next section's heading — then straight down
+          //    the lane past the stages and the instructor.
+          pts.push([exit[0], map.bottom - 34]);
+          pts.push([xRight, map.bottom - 34]);
+          pts.push([xRight, grid.top - 40]);
 
-          // 3. Across to the left of the cards, above them all.
-          pts.push([xLeft, grid.top - 60]);
-
-          // 4. Weave down through the gutters between the first row of
-          //    cards. Each horizontal run sits clear of the card it passes.
+          // 4. Thread the gutters. The cards in a row are the same height —
+          //    misaligned cards read as a mistake — so the weave comes from
+          //    the grid's own empty columns instead of a vertical stagger:
+          //    in above the row, down the first gutter, across the row gap,
+          //    down the second gutter, out below the grid.
           const rowCards = Array.from(
             root!.querySelectorAll<HTMLElement>("[data-route-row]"),
           );
@@ -199,22 +185,31 @@ export function RouteJourney({ children }: { children: ReactNode }) {
             .map((c) => box(c, wrapRect))
             .filter((b): b is Box => Boolean(b));
 
+          const yAbove = grid.top - 40;
+          pts.push([xLeft, yAbove]);
+
           if (rects.length === 3) {
             const [c1, c2, c3] = rects;
             const g1 = (c1.right + c2.left) / 2;
             const g2 = (c2.right + c3.left) / 2;
-            const yA = c1.bottom + 34;
-            const yB = c2.bottom + 34;
-            const yC = c3.bottom + 34;
+            // Midway down the gap between the two rows, so the crossing run
+            // clears both of them.
+            const yGap = (c1.bottom + Math.min(grid.bottom, c1.bottom + 64)) / 2;
 
-            pts.push([xLeft, yA]);
-            pts.push([g1, yA]);
-            pts.push([g1, yB]);
-            pts.push([g2, yB]);
-            pts.push([g2, yC]);
-            pts.push([xRight, yC]);
+            // The grid box can sit a little above its own last row, so take
+            // the lowest card rather than trusting the container.
+            const cardBottoms = cards
+              .map((c) => box(c, wrapRect)?.bottom ?? 0)
+              .concat(grid.bottom);
+            const yBelow = Math.max(...cardBottoms) + 36;
+
+            pts.push([g1, yAbove]);
+            pts.push([g1, yGap]);
+            pts.push([g2, yGap]);
+            pts.push([g2, yBelow]);
+            pts.push([xRight, yBelow]);
           } else {
-            pts.push([xLeft, grid.bottom + 40]);
+            pts.push([xRight, yAbove]);
             pts.push([xRight, grid.bottom + 40]);
           }
 
@@ -225,29 +220,22 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           // Small screens: the same map route through the hero — cropped to
           // a portrait window — then one reserved gutter down the left-hand
           // side, with a small bend beside each card. Never over the content.
-          const map = get("[data-route-anchor='map']");
           const lane = get("[data-lane='left']");
           const laneX = lane ? lane.cx : 24;
           const grid = get("[data-course-grid]");
 
-          // The portrait crop only behaves while the hero is tall and narrow.
-          // On a wide-but-short tablet hero the map stays as backdrop and the
-          // route keeps to its gutter.
-          const portrait = window.matchMedia("(max-width: 767px)").matches;
-
-          if (map && portrait) {
-            const project = mapProjector(map, MOBILE_MAP_CROP);
-            const hero = ROUTE_PTS.slice(0, -1).map(project);
-            pts.push(...hero);
-            HERO_PINS.forEach((p) => pinPoints.push(project([p.x, p.y])));
-
-            // Leave the map and join the gutter.
-            const exit = hero[hero.length - 1];
-            pts.push([exit[0], map.bottom + 40]);
-            pts.push([laneX, map.bottom + 40]);
-          } else {
-            pts.push([laneX, -40]);
-          }
+          // Below `lg` the map carries no route and no pins — at portrait
+          // width they landed in the content column. What remains is a single
+          // red line hanging from under the header and threading the
+          // sections. It starts below the header rather than behind it, so it
+          // never crosses the logo.
+          const headerH =
+            Number.parseFloat(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                "--header-h",
+              ),
+            ) * 16 || 92;
+          pts.push([laneX, headerH + 10]);
 
           const rects = cards
             .map((c) => box(c, wrapRect))
@@ -332,10 +320,9 @@ export function RouteJourney({ children }: { children: ReactNode }) {
       mm.add("(prefers-reduced-motion: reduce)", () => {
         const draw = () => {
           if (!buildRoute()) return;
-          const total = base.getTotalLength();
-          gsap.set(done, { strokeDasharray: total, strokeDashoffset: 0 });
-          const end = base.getPointAtLength(total);
-          gsap.set(dot, { x: end.x, y: end.y, opacity: 1 });
+          gsap.set(done, { drawSVG: "0% 100%" });
+          const end = base.getPointAtLength(base.getTotalLength());
+          gsap.set(dot, { transformOrigin: "50% 50%", x: end.x, y: end.y, opacity: 1 });
           gsap.set(finishMark, { opacity: 1 });
           pins.forEach((p) => {
             if (p.dataset.placed === "1") gsap.set(p, { opacity: 1 });
@@ -375,9 +362,6 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           const built = buildRoute();
           if (!built) return;
 
-          const total = base.getTotalLength();
-          gsap.set(done, { strokeDasharray: total });
-
           const wrapRect = root.getBoundingClientRect();
           cardStops = cards.map((c) => {
             const b = box(c, wrapRect)!;
@@ -394,15 +378,10 @@ export function RouteJourney({ children }: { children: ReactNode }) {
 
         layout();
 
-        const state = { p: 0 };
-
-        const render = () => {
-          const total = base.getTotalLength();
-          const at = Math.min(1, Math.max(0, state.p));
-          const point = base.getPointAtLength(total * at);
-          gsap.set(dot, { x: point.x, y: point.y });
-          gsap.set(done, { strokeDashoffset: total * (1 - at) });
-
+        // Everything that is not the stroke or the dot: which cards have been
+        // passed, which stops have lit, whether the destination is reached.
+        // Driven from ScrollTrigger's own progress so it reverses exactly.
+        const applyStates = (at: number) => {
           cards.forEach((card, i) => {
             const passed = at >= (cardStops[i] ?? 2) - 0.005;
             const next = passed ? "true" : "false";
@@ -415,7 +394,8 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           gsap.set(finishMark, { opacity: at > 0.985 ? 1 : 0.5 });
         };
 
-        render();
+        gsap.set(dot, { transformOrigin: "50% 50%" });
+        applyStates(0);
 
         const tl = gsap.timeline({
           defaults: { ease: "none" },
@@ -427,16 +407,35 @@ export function RouteJourney({ children }: { children: ReactNode }) {
             start: "top center",
             endTrigger: "[data-route-anchor='finish']",
             end: "center center",
-            scrub: 0.55,
+            // Exactly tied to scroll, so it reverses on the way back up with
+            // no lag and no drift at either end.
+            scrub: true,
+            onUpdate: (self) => applyStates(self.progress),
             invalidateOnRefresh: true,
-            onRefresh: () => {
+            onRefresh: (self) => {
+              // The path is rebuilt from measured layout, so DrawSVG and
+              // MotionPath have to re-read it. `invalidate()` makes both
+              // plugins re-initialise against the new `d`.
               layout();
-              render();
+              self.animation?.invalidate();
+              applyStates(self.progress);
             },
           },
         });
 
-        tl.fromTo(state, { p: 0 }, { p: 1, duration: 1, onUpdate: render }, 0);
+        // The route draws itself with DrawSVG and the dot rides the same
+        // path with MotionPath, both on this one scrubbed timeline — so they
+        // cannot drift apart, and scrolling up reverses both.
+        tl.fromTo(
+          done,
+          { drawSVG: "0% 0%" },
+          { drawSVG: "0% 100%", duration: 1 },
+          0,
+        ).to(
+          dot,
+          { motionPath: { path: base }, duration: 1 },
+          0,
+        );
 
         // Anything that changes the page height moves every anchor the route
         // is built from: viewport resize, webfonts swapping in, an accordion

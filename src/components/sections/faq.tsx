@@ -12,24 +12,19 @@ export function Faq() {
   return (
     <section
       id="faqs"
-      className="scroll-mt-24 border-t border-hairline py-16 lg:py-24"
+      data-section="faq"
+      className="section-y border-t border-hairline"
     >
       <div className="shell grid gap-12 lg:grid-cols-12 lg:gap-14">
         <div className="lg:col-span-4">
-          <p className="eyebrow">
+          <p data-anim-line className="eyebrow">
             Questions
           </p>
-          <h2
-            className="display mt-3 text-[clamp(1.9rem,4vw,2.7rem)]"
-           
-          >
+          <h2 data-anim-heading className="display mt-3 text-[clamp(1.9rem,4vw,2.7rem)]">
             Before you book.
           </h2>
-          <p
-            className="mt-5 max-w-[24rem] text-[1.02rem] leading-[1.62] text-ink-soft"
-           
-          >
-            If something is not covered here, ring or email — a person answers,
+          <p data-anim-line className="mt-5 max-w-[24rem] text-[1.02rem] leading-[1.62] text-ink-soft">
+            If something is not covered here, message us — a person answers,
             and there is no sales script.
           </p>
 
@@ -41,13 +36,15 @@ export function Faq() {
               <Phone className="size-4" aria-hidden="true" />
               {site.contact.phoneDisplay}
             </a>
-            <a
-              href={`mailto:${site.contact.email}`}
-              className="inline-flex items-center gap-2.5 text-[0.98rem] font-medium text-brand hover:underline"
-            >
-              <Mail className="size-4" aria-hidden="true" />
-              {site.contact.email}
-            </a>
+            {site.contact.email && (
+              <a
+                href={`mailto:${site.contact.email}`}
+                className="inline-flex items-center gap-2.5 text-[0.98rem] font-medium text-brand hover:underline"
+              >
+                <Mail className="size-4" aria-hidden="true" />
+                {site.contact.email}
+              </a>
+            )}
           </div>
         </div>
 

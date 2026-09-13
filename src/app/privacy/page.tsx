@@ -23,7 +23,12 @@ export default function Privacy() {
         {site.contact.address.line2}, {site.contact.address.city}{" "}
         {site.contact.address.postcode}. You can reach us on{" "}
         <a href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a> or at{" "}
-        <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+        {site.contact.email ? (
+          <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+        ) : (
+          <strong>TODO_EMAIL</strong>
+        )}
+        .
       </p>
 
       <h2>What we collect</h2>

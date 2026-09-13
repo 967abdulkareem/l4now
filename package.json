@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit",
     "audit": "node scripts/audit.mjs",
     "logo": "node scripts/process-logo.mjs",
-    "contrast": "node scripts/audit-hero-contrast.mjs"
+    "contrast": "node scripts/audit-hero-contrast.mjs",
+    "verify": "node scripts/verify.mjs",
+    "gaps": "node scripts/audit-gaps.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

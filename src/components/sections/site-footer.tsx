@@ -35,14 +35,16 @@ export function SiteFooter() {
                 WhatsApp {WHATSAPP_DISPLAY}
               </a>
             </li>
-            <li>
-              <a
-                href={`mailto:${site.contact.email}`}
-                className="text-ink hover:text-brand hover:underline"
-              >
-                {site.contact.email}
-              </a>
-            </li>
+            {site.contact.email && (
+              <li>
+                <a
+                  href={`mailto:${site.contact.email}`}
+                  className="text-ink hover:text-brand hover:underline"
+                >
+                  {site.contact.email}
+                </a>
+              </li>
+            )}
           </ul>
 
           <address className="mt-5 text-[0.93rem] leading-[1.6] text-muted-foreground not-italic">
