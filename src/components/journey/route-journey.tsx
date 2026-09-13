@@ -168,7 +168,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           // 2. Step across to the right-hand lane while still over the map —
           //    doing it below the hero would put a horizontal run within a
           //    few pixels of the next section's heading — then straight down
-          //    the lane past the stages and the instructor.
+          //    the lane past the stages.
           pts.push([exit[0], map.bottom - 34]);
           pts.push([xRight, map.bottom - 34]);
           pts.push([xRight, grid.top - 40]);

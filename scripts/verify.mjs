@@ -275,7 +275,7 @@ check("route reverses on scroll up", scrub.reversed && scrub.endMatchesStart);
 
 /* ----------------------------------------------------------- anchors ---- */
 console.log("\nanchor offsets (1440px)");
-for (const id of ["how", "pricing", "instructor", "reviews", "faqs", "book"]) {
+for (const id of ["how", "pricing", "reviews", "faqs", "book"]) {
   const r = await js(
     [
       "(async () => {",

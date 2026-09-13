@@ -4,7 +4,6 @@ import { Pricing } from "@/components/sections/pricing";
 import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
-import { Instructor } from "@/components/sections/instructor";
 import { Reservation } from "@/components/sections/reservation";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { Testimonials } from "@/components/sections/testimonials";
@@ -42,7 +41,6 @@ export default function Home() {
           <RouteJourney>
             <Hero />
             <HowItWorks />
-            <Instructor />
             <Pricing />
             <Reservation />
           </RouteJourney>

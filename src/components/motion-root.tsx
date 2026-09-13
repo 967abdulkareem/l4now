@@ -158,18 +158,6 @@ export function MotionRoot({ children }: { children: ReactNode }) {
                 0.25,
               );
             }
-          } else if (kind === "instructor") {
-            // Portrait settles, the copy follows it in.
-            tl.from(
-              items,
-              {
-                y: 26,
-                autoAlpha: 0,
-                duration: 0.8,
-                stagger: MOTION.stagger,
-              },
-              0.2,
-            );
           } else {
             tl.from(
               items,

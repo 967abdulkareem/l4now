@@ -30,7 +30,6 @@ const SHOTS = [
   ["booking-mobile", 390, 844, "#book", -40],
   ["reviews-desktop", 1440, 900, "#reviews", -90],
   ["reviews-mobile", 390, 844, "#reviews", -70],
-  ["instructor-desktop", 1440, 900, "#instructor", -90],
   ["how-desktop", 1440, 900, "#how", -90],
 ];
 
