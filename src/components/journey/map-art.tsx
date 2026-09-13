@@ -29,14 +29,17 @@ const WATER = "#d8e3ea";
 export function MapArt({
   className,
   preserveAspectRatio = "xMidYMid slice",
+  viewBox,
 }: {
   className?: string;
   preserveAspectRatio?: string;
+  /** Crop window, for the narrow portrait framing. Defaults to the whole map. */
+  viewBox?: string;
 }) {
   return (
     <svg
       data-map-svg
-      viewBox={`0 0 ${MAP_VIEWBOX.w} ${MAP_VIEWBOX.h}`}
+      viewBox={viewBox ?? `0 0 ${MAP_VIEWBOX.w} ${MAP_VIEWBOX.h}`}
       preserveAspectRatio={preserveAspectRatio}
       className={className}
       aria-hidden="true"

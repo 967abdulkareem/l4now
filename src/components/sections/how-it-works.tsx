@@ -6,17 +6,22 @@ export function HowItWorks() {
     <section id="how" className="scroll-mt-24 py-16 lg:py-24">
       <div className="shell">
         <Lanes>
-          <h2 className="display text-[clamp(1.9rem,4vw,2.7rem)]">
+          <h2 className="display text-[clamp(1.9rem,4vw,2.7rem)]" data-reveal>
             How it works.
           </h2>
-          <p className="mt-4 max-w-[34rem] text-[1.02rem] leading-[1.6] text-ink-soft">
+          <p className="mt-4 max-w-[34rem] text-[1.02rem] leading-[1.6] text-ink-soft" data-reveal>
             Three stages, in the order everyone takes them. You move on when you
             are ready, not when a timetable says so.
           </p>
 
           <ol className="mt-12 grid gap-10 sm:grid-cols-3 sm:gap-8">
-            {site.steps.map((step) => (
-              <li key={step.id} className="border-t border-hairline pt-5">
+            {site.steps.map((step, i) => (
+              <li
+                key={step.id}
+                data-reveal
+                style={{ "--reveal-delay": `${i * 60}ms` } as React.CSSProperties}
+                className="border-t border-hairline pt-5"
+              >
                 <span className="font-mono text-[0.8rem] tracking-[0.16em] text-brand">
                   {step.step}
                 </span>

@@ -15,10 +15,11 @@ the school and the visitor presses send.
 
 | What | Where |
 | --- | --- |
+| Prices | `data/pricing.ts` |
 | WhatsApp number | `src/lib/whatsapp.ts` |
 | Testimonials | `data/testimonials.json` |
-| Prices, areas, FAQs, hours, address | `src/lib/site.ts` |
-| Logo | drop the file at `assets/logo-source.jpg`, then `npm run logo` |
+| FAQs, hours, address, copy | `src/lib/site.ts` |
+| Logo | replace `public/logo.png`, then `npm run logo` |
 
 Everything else is layout.
 
@@ -60,8 +61,9 @@ Open `data/testimonials.json`. It is a list; each entry looks like this:
 
 - `name` — shown in bold under the photo.
 - `photo` — put the image file in `public/assets/testimonials/` and use the
-  path `/assets/testimonials/<filename>`. Square images look best. Leave the
-  existing `placeholder-N.png` value if you have no photo yet.
+  path `/assets/testimonials/<filename>`. Any size works: tiles are square and
+  crop the photo to fit. Leave the `placeholder-N.svg` value if you have no
+  photo yet.
 - `rating` — a whole number 1–5. Delete the line to hide the stars.
 - `quote` — keep it short. Anything past ~180 characters is trimmed with an
   ellipsis so the cards stay the same shape.
@@ -87,30 +89,53 @@ That one file feeds the form, the header link and the footer.
 
 ---
 
+## Changing prices
+
+`data/pricing.ts` holds every figure. Each entry looks like this:
+
+```ts
+{
+  id: "standard-lesson",
+  name: "Standard lesson",
+  subtitle: "Pay as you go",
+  price: "£37",
+  unit: "per hour",
+  note: "…",
+  ctaLabel: "Book a lesson",
+}
+```
+
+- **Removing the intro offer** — delete the `originalPrice` and `badge` lines
+  from the `first-lesson` entry. The strike-through and the flag disappear.
+- **A price you do not have yet** — leave it as `TODO_PRICE`. The card shows
+  "Price on request" with an **Ask us** button that opens WhatsApp with the
+  package name filled in, rather than a blank figure.
+- **Automatic transmission** — the `transmission` field exists and is unset
+  everywhere, because whether automatic is offered is not confirmed. Set it to
+  `"both"` if the rate is the same, or add separate `"manual"` and
+  `"automatic"` entries if it is not. The file explains both.
+
+The small print under the grid is the `pricingNote` export in the same file.
+
 ## Replacing the logo
 
-1. Save the supplied artwork as `assets/logo-source.jpg` (`.jpeg` and `.png`
-   also work).
+1. Overwrite `public/logo.png` with the new artwork. It should already have a
+   transparent background — nothing removes one for you.
 2. Run:
 
    ```bash
    npm run logo
    ```
 
-The script removes the white background, trims the margins and writes
-`public/assets/logo/`: `favicon-32.png`, `favicon-180.png`, `favicon-512.png`,
-`logo-header.png`, `logo-footer.png` and a full-size transparent
-`logo-master.png`. It needs Google Chrome installed; set `CHROME_PATH` if
-Chrome lives somewhere unusual.
+That regenerates `public/favicon-32.png`, `favicon-180.png`, `favicon-512.png`
+(composited on a white square, because the source is wide and small) and
+`public/og.png` (1200×630, logo centred) — plus the six placeholder avatars.
+It needs Google Chrome installed; set `CHROME_PATH` if Chrome is somewhere
+unusual.
 
-The header and footer currently draw the mark as inline SVG
-(`src/components/brand-logo.tsx`) so it is razor sharp at any size. To use the
-exported PNG instead, replace `<BrandLogo … />` in
-`src/components/site-header.tsx` with:
-
-```tsx
-<img src="/assets/logo/logo-header.png" alt="L_4NOW Driving School" width={168} />
-```
+The header and footer render `public/logo.png` directly, capped at its native
+width so it is never upscaled. The logo already contains the wordmark and
+strapline, so no text is set beside it.
 
 ---
 
@@ -146,12 +171,14 @@ See `NOTES.md`.
 ## Project layout
 
 ```
-assets/                 logo source artwork (not committed)
+data/pricing.ts         every price on the site
 data/testimonials.json  the reviews shown on the site
-public/assets/          generated logo + avatar images
+public/logo.png         the logo, used as-is
+public/favicon-*.png    generated from it by `npm run logo`
+public/og.png           social card, generated the same way
 src/app/                pages, metadata, legal pages
 src/components/         sections, header, footer, form
-src/lib/site.ts         all business copy and details
+src/lib/site.ts         business copy and details
 src/lib/whatsapp.ts     the WhatsApp number
 scripts/                asset generation + screenshot/audit tooling
 ```
@@ -167,9 +194,17 @@ scripts/                asset generation + screenshot/audit tooling
 | `npm run lint` | ESLint |
 | `npm run screenshots` | Save reference screenshots to `docs/screenshots/` |
 | `npm run audit` | Check the scroll route never overlaps content, at 7 widths |
+| `npm run contrast` | Sample real pixels to check hero text over the map |
 
 ## Accessibility and motion
 
-Keyboard navigable with visible focus, labelled form controls, AA contrast. The
-scroll animation is disabled automatically for anyone with "reduce motion" set
-in their operating system — the route is simply shown complete.
+Keyboard navigable with visible focus, labelled form controls, AA contrast.
+
+Testimonial tiles reveal their quote on hover on pointer devices, and on tap in
+a panel below the row on touch devices — the quote is in the page for screen
+readers either way.
+
+Everything is disabled for anyone with "reduce motion" set in their operating
+system: no scroll-linked route, no reveals, no tile flip, and no smooth
+scrolling. Nothing is hidden until JavaScript runs, so the page is readable
+even if the script never loads.

@@ -1,6 +1,6 @@
 import { RouteJourney } from "@/components/journey/route-journey";
-import { Areas } from "@/components/sections/areas";
-import { Courses } from "@/components/sections/courses";
+import { Reveal } from "@/components/reveal";
+import { Pricing } from "@/components/sections/pricing";
 import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
@@ -28,7 +28,6 @@ function schema() {
       addressCountry: "GB",
     },
     openingHours: hours.map((row) => `${row.days} ${row.time}`),
-    areaServed: site.areas.groups.map((group) => group.name),
   };
 }
 
@@ -41,15 +40,15 @@ export default function Home() {
         <RouteJourney>
           <Hero />
           <HowItWorks />
-          <Courses />
+          <Pricing />
           <Reservation />
         </RouteJourney>
 
         <Testimonials />
-        <Areas />
         <Faq />
       </main>
       <SiteFooter />
+      <Reveal />
       <script
         type="application/ld+json"
         // Generated from the site config above; no user input reaches this.

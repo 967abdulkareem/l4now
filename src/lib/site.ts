@@ -47,12 +47,19 @@ export const site = {
     { days: "Sunday", time: "09:00 – 16:00" },
   ],
 
-  /** The three notes under the hero buttons, mirroring the map's waypoints. */
-  heroPoints: [
-    { title: "Your first turn", detail: "Build the basics" },
-    { title: "Build confidence", detail: "Step by step" },
-    { title: "Your next lesson", detail: "Keep moving forward" },
+  /**
+   * Facts shown under the hero buttons. Deliberately not a restatement of the
+   * journey — the map pins and "How it works" cover that.
+   */
+  trustSignals: [
+    "DVSA-approved instructor (ADI)",
+    "Manual & automatic",
+    "Pick-up and drop-off included",
   ],
+
+  /** One line instead of a coverage table — lessons cover the whole area. */
+  coverage:
+    "Lessons cover the whole local area, with pick-up and drop-off included at no extra cost.",
 
   /**
    * The courses the GPS route travels past. `price` is deliberately null
@@ -134,33 +141,6 @@ export const site = {
     },
   ],
 
-  /** Fictional coverage areas. Replace with the real towns and postcodes. */
-  areas: {
-    note: "Pick up and drop off is included anywhere below. Just outside? Ring us — we can often still help.",
-    groups: [
-      {
-        name: "Central",
-        postcodes: "PL1 – PL4",
-        places: ["Northgate", "Wenlock", "Aldermere", "Kingsfold"],
-      },
-      {
-        name: "North",
-        postcodes: "PL5 – PL7",
-        places: ["Harrowby", "Fen Rise", "Oakhurst", "Milbrook"],
-      },
-      {
-        name: "South & coast",
-        postcodes: "PL8 – PL11",
-        places: ["Sandbourne", "Cleve Bay", "Thornmouth", "Redhaven"],
-      },
-      {
-        name: "Villages",
-        postcodes: "Selected PL12+",
-        places: ["Little Ashby", "Marlow End", "Greyfield", "Upper Dene"],
-      },
-    ],
-  },
-
   faqs: [
     {
       q: "How many lessons will I need?",
@@ -197,10 +177,9 @@ export const site = {
   ],
 
   nav: [
-    { label: "Lessons", href: "#courses" },
+    { label: "Lessons", href: "#pricing" },
     { label: "How it works", href: "#how" },
     { label: "Reviews", href: "#reviews" },
-    { label: "Areas", href: "#areas" },
     { label: "FAQs", href: "#faqs" },
   ],
 

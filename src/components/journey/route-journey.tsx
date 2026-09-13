@@ -49,13 +49,41 @@ function tidy(pts: Pt[]) {
 }
 
 /**
- * The map SVG uses `preserveAspectRatio="xMidYMid slice"`, so design-space
- * points have to go through the same transform to land on the drawn roads.
+ * The narrow-screen crop of the map. Kept in step with the `viewBox` and
+ * `preserveAspectRatio` that hero.tsx gives the mobile <MapArt>, so the route
+ * lands on the drawn roads there too.
+ *
+ * `alignY: 1` is xMidYMax — the bottom of the window meets the bottom of the
+ * hero, which is what puts the three pins below the copy rather than under it.
  */
-function mapProjector(box: Box) {
-  const scale = Math.max(box.w / MAP_VIEWBOX.w, box.h / MAP_VIEWBOX.h);
-  const dx = box.left + (box.w - MAP_VIEWBOX.w * scale) / 2;
-  const dy = box.top + (box.h - MAP_VIEWBOX.h * scale) / 2;
+export const MOBILE_MAP_CROP = {
+  x: 0,
+  y: -1430,
+  w: 1100,
+  h: 2400,
+  alignX: 0.5,
+  alignY: 1,
+} as const;
+
+const DESKTOP_MAP_CROP = {
+  x: 0,
+  y: 0,
+  w: MAP_VIEWBOX.w,
+  h: MAP_VIEWBOX.h,
+  alignX: 0.5,
+  alignY: 0.5,
+} as const;
+
+type Crop = typeof DESKTOP_MAP_CROP | typeof MOBILE_MAP_CROP;
+
+/**
+ * The map SVG uses `preserveAspectRatio="… slice"`, so design-space points
+ * have to go through the same transform to land on the drawn roads.
+ */
+function mapProjector(box: Box, crop: Crop) {
+  const scale = Math.max(box.w / crop.w, box.h / crop.h);
+  const dx = box.left + (box.w - crop.w * scale) * crop.alignX - crop.x * scale;
+  const dy = box.top + (box.h - crop.h * scale) * crop.alignY - crop.y * scale;
   return (p: readonly [number, number]): Pt => [
     dx + p[0] * scale,
     dy + p[1] * scale,
@@ -143,7 +171,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           const grid = get("[data-course-grid]");
           if (!map || !laneRight || !laneLeft || !grid) return null;
 
-          const project = mapProjector(map);
+          const project = mapProjector(map, DESKTOP_MAP_CROP);
 
           // 1. The hero, following the drawn primary road.
           const hero = ROUTE_PTS.slice(0, -1).map(project);
@@ -162,9 +190,12 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           // 3. Across to the left of the cards, above them all.
           pts.push([xLeft, grid.top - 60]);
 
-          // 4. Weave down through the gutters between the cards. Each
-          //    horizontal run sits clear of the card it passes.
-          const rects = cards
+          // 4. Weave down through the gutters between the first row of
+          //    cards. Each horizontal run sits clear of the card it passes.
+          const rowCards = Array.from(
+            root!.querySelectorAll<HTMLElement>("[data-route-row]"),
+          );
+          const rects = (rowCards.length ? rowCards : cards)
             .map((c) => box(c, wrapRect))
             .filter((b): b is Box => Boolean(b));
 
@@ -191,13 +222,32 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           pts.push([xRight, finish.cy]);
           pts.push([finish.cx, finish.cy]);
         } else {
-          // Small screens: one reserved gutter down the left-hand side, with
-          // a short jog beside each card. Never over the content.
+          // Small screens: the same map route through the hero — cropped to
+          // a portrait window — then one reserved gutter down the left-hand
+          // side, with a small bend beside each card. Never over the content.
+          const map = get("[data-route-anchor='map']");
           const lane = get("[data-lane='left']");
           const laneX = lane ? lane.cx : 24;
           const grid = get("[data-course-grid]");
 
-          pts.push([laneX, -40]);
+          // The portrait crop only behaves while the hero is tall and narrow.
+          // On a wide-but-short tablet hero the map stays as backdrop and the
+          // route keeps to its gutter.
+          const portrait = window.matchMedia("(max-width: 767px)").matches;
+
+          if (map && portrait) {
+            const project = mapProjector(map, MOBILE_MAP_CROP);
+            const hero = ROUTE_PTS.slice(0, -1).map(project);
+            pts.push(...hero);
+            HERO_PINS.forEach((p) => pinPoints.push(project([p.x, p.y])));
+
+            // Leave the map and join the gutter.
+            const exit = hero[hero.length - 1];
+            pts.push([exit[0], map.bottom + 40]);
+            pts.push([laneX, map.bottom + 40]);
+          } else {
+            pts.push([laneX, -40]);
+          }
 
           const rects = cards
             .map((c) => box(c, wrapRect))
@@ -228,7 +278,6 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           `translate(${round(finish.cx)} ${round(finish.cy)})`,
         );
 
-        // Pins only exist on the wide layout.
         pins.forEach((pin, i) => {
           const p = pinPoints[i];
           pin.dataset.placed = p ? "1" : "0";
@@ -236,7 +285,24 @@ export function RouteJourney({ children }: { children: ReactNode }) {
             pin.setAttribute("opacity", "0");
             return;
           }
-          pin.setAttribute("transform", `translate(${round(p[0])} ${round(p[1])})`);
+          pin.setAttribute(
+            "transform",
+            `translate(${round(p[0])} ${round(p[1])})`,
+          );
+
+          // Narrow screens run out of room to the right of a pin, so the
+          // label flips to the other side rather than being clipped.
+          const label = pin.querySelector<SVGGElement>("[data-pin-label]");
+          const chip = label?.querySelector("rect");
+          if (!label || !chip) return;
+          const labelW = Number(chip.getAttribute("width") ?? 0);
+          const flip = p[0] + 14 + labelW > W - 10;
+          label.setAttribute(
+            "transform",
+            flip
+              ? `translate(${round(-14 - labelW)} -13)`
+              : "translate(14 -13)",
+          );
         });
 
         return true;
@@ -432,7 +498,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           <g key={pin.id} data-route-pin opacity="0.25">
             <circle r="5.5" fill="#e52222" />
             <circle r="2" fill="#ffffff" />
-            <g transform="translate(14 -13)">
+            <g data-pin-label transform="translate(14 -13)">
               <rect
                 width={pin.label.length * 7.1 + 22}
                 height="26"

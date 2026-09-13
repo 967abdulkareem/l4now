@@ -20,8 +20,10 @@ export function Reservation() {
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="lg:col-span-4">
-              <p className="eyebrow">Next step</p>
-              <h2 className="display mt-3 text-[clamp(2rem,4.4vw,2.9rem)]">
+              <p className="eyebrow" data-reveal>
+                Next step
+              </p>
+              <h2 className="display mt-3 text-[clamp(2rem,4.4vw,2.9rem)]" data-reveal>
                 Ready for your next turn?
               </h2>
               <p className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
@@ -82,11 +84,7 @@ export function Reservation() {
                       Pick up
                     </dt>
                     <dd className="mt-0.5 text-[0.93rem] text-ink-soft">
-                      Anywhere in{" "}
-                      <a href="#areas" className="text-brand underline">
-                        our coverage areas
-                      </a>
-                      , included.
+                      {site.coverage}
                     </dd>
                   </div>
                 </div>

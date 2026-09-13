@@ -23,11 +23,13 @@ const CHROME =
 /** [name, width, height, how to position the page before capturing] */
 const SHOTS = [
   ["hero-desktop", 1440, 900, () => 0],
-  ["courses-desktop", 1440, 900, "[data-course-grid]", -150],
+  ["pricing-desktop", 1440, 900, "[data-course-grid]", -150],
   ["booking-desktop", 1440, 980, "#book", -60],
   ["hero-mobile", 390, 844, () => 0],
-  ["courses-mobile", 390, 844, "[data-course-grid]", -80],
+  ["pricing-mobile", 390, 844, "[data-course-grid]", -80],
   ["booking-mobile", 390, 844, "#book", -40],
+  ["reviews-desktop", 1440, 900, "#reviews", -90],
+  ["reviews-mobile", 390, 844, "#reviews", -70],
 ];
 
 mkdirSync(OUT, { recursive: true });

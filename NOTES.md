@@ -89,9 +89,34 @@ The hero map, the route and the moving GPS dot are one system:
   crosses text at any width, and why it is rebuilt on resize, on font load and
   whenever the page height changes.
 - The reserved gutters are real layout, not decoration. If you remove the
-  `<Lanes>` wrapper or tighten `gap-x-14` on the course grid, the route will
+  `<Lanes>` wrapper or tighten `gap-x-14` on the pricing grid, the route will
   have nowhere to go.
-- `npm run audit` checks this automatically at seven widths.
+- The weave is built from the **first row** of pricing cards, marked
+  `data-route-row`. Cards after the third sit below the weave. Change the grid
+  to something other than three columns and that geometry needs revisiting.
+- `npm run audit` checks this automatically at seven widths, including the
+  form fields.
+
+### The map on small screens — one thing to keep in step
+
+Phones show the same vector map behind the hero, cropped to a portrait window
+so the red route lands *below* the copy instead of running through it. That
+crop is written in two places and they must match:
+
+- `src/components/sections/hero.tsx` — the `viewBox` and `preserveAspectRatio`
+  on the mobile `<MapArt>`;
+- `MOBILE_MAP_CROP` in `src/components/journey/route-journey.tsx` — the same
+  numbers, used to project the route onto the drawn roads.
+
+Change one without the other and the red line drifts off the streets.
+
+The portrait crop only behaves while the hero is tall and narrow, so it is
+scoped to under 768px. Tablets keep the desktop framing as a full-bleed
+backdrop and the route stays in its gutter.
+
+`npm run contrast` screenshots the hero at 360/390/430 and measures real
+pixels behind each line of text. It skips labels too small to separate glyphs
+from background — for those, check the colour pair by hand.
 
 Anyone with "reduce motion" enabled gets the finished route drawn statically and
 no scroll-linked animation at all.
@@ -102,13 +127,16 @@ no scroll-linked animation at all.
 
 Tracked with `TODO:` comments in the source, and listed in the handover summary:
 
-- `src/lib/site.ts` — domain, email address, postal address, coverage areas and
-  postcodes, course prices (deliberately blank, shown as "Price to be
-  confirmed"), opening hours.
+- `src/lib/site.ts` — domain, email address, postal address, opening hours.
+- `data/pricing.ts` — four `TODO_PRICE` entries, and the unset `transmission`
+  field.
 - `data/testimonials.json` — six placeholder reviews.
-- `assets/logo-source.jpg` — the supplied artwork has not been added yet, so the
-  built-in SVG mark is used.
 - `src/app/privacy/page.tsx`, `terms/page.tsx`, `accessibility/page.tsx` —
   plain-English drafts, not legal advice.
 
-Nothing on the site invents a price, a review, a pass rate or a qualification.
+Nothing on the site invents a price, a review, a pass rate, a student count or
+a number of years in business.
+
+The instructor is described as a **DVSA-approved instructor (ADI)** throughout.
+Do not change that to "examiner": examiners are DVSA staff who conduct tests,
+and claiming it would be misleading advertising.

@@ -12,11 +12,11 @@ export function SiteFooter() {
       <div className="shell grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:py-20">
         <div className="sm:col-span-2 lg:col-span-1">
           <BrandLogo width={180} className="h-auto w-[180px]" />
-          <p className="mt-3 text-[0.82rem] font-semibold tracking-[0.16em] text-brand uppercase">
-            {site.tagline}
-          </p>
           <p className="mt-4 max-w-[22rem] text-[0.93rem] leading-[1.6] text-muted-foreground">
             {site.description}
+          </p>
+          <p className="mt-3 max-w-[22rem] text-[0.93rem] leading-[1.6] text-muted-foreground">
+            {site.coverage}
           </p>
         </div>
 

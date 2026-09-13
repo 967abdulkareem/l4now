@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { ScrollTrigger, gsap } from "@/lib/gsap";
 
 /** Height of the fixed header, so anchor jumps do not land underneath it. */
-const HEADER_OFFSET = 76;
+const HEADER_OFFSET = 116;
 
 /**
  * Lenis, driven by GSAP's ticker and feeding ScrollTrigger on every frame —
