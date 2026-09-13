@@ -116,6 +116,19 @@ const HELPERS = [
   "1",
 ].join("\n");
 
+/* With only a couple of reviews the slideshow can return to where it started
+   between two samples, so movement is detected by polling rather than by
+   comparing the two ends of a wait. */
+const movedWithin = async (ms) => {
+  const start = await js("__live()");
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    await sleep(400);
+    if ((await js("__live()")) !== start) return true;
+  }
+  return false;
+};
+
 /* ------------------------------------------------ carousel, motion on --- */
 console.log("\ncarousel (1440px, motion on)");
 await reduce(false);
@@ -123,10 +136,7 @@ await load();
 await js(HELPERS);
 await js("__show(__c())");
 
-const first = await js("__live()");
-await sleep(8000);
-const advanced = await js("__live()");
-check("autoplay advances", first !== advanced, `${first} -> ${advanced}`);
+check("autoplay advances", await movedWithin(9000));
 
 const h1 = await js("__cardH()");
 
@@ -146,8 +156,7 @@ const mouse = async (type, y) => {
 await mouse("mouseMoved");
 await sleep(300);
 const held = await js("__live()");
-await sleep(8000);
-check("pauses on hover", held === (await js("__live()")), held);
+check("pauses on hover", !(await movedWithin(9000)), held);
 await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 2, y: 2, buttons: 0 });
 
 /* Everything below is deterministic only while the timer is stopped. */
@@ -156,8 +165,7 @@ await sleep(400);
 const pausedLabel = await js('__btn("slideshow").getAttribute("aria-label")');
 check("pause button toggles", /Play review/.test(pausedLabel), pausedLabel);
 const atPause = await js("__live()");
-await sleep(8000);
-check("paused stays put", atPause === (await js("__live()")), atPause);
+check("paused stays put", !(await movedWithin(9000)), atPause);
 
 await js('__btn("Next review").click()');
 await sleep(800);
@@ -180,8 +188,7 @@ await sleep(800);
 await js('__btn("slideshow").click()');
 await sleep(400);
 const focusHeld = await js('__focusEvt("focusin", __c().querySelector("button")); __live()');
-await sleep(8000);
-check("pauses on keyboard focus", focusHeld === (await js("__live()")), focusHeld);
+check("pauses on keyboard focus", !(await movedWithin(9000)), focusHeld);
 await js('__focusEvt("focusout", __c().querySelector("button"))');
 
 const beforeSwipe = await js("__live()");
@@ -196,13 +203,15 @@ await js(
 await sleep(800);
 check("swipe advances", beforeSwipe !== (await js("__live()")), beforeSwipe);
 
-await js('__c().querySelectorAll("li button")[4].click()');
+const dotCount = await js('__c().querySelectorAll("li button").length');
+const last = dotCount - 1;
+await js(`__c().querySelectorAll("li button")[${last}].click()`);
 await sleep(800);
 const dotLive = await js("__live()");
-check("dots jump to slide", /Review 5 of/.test(dotLive), dotLive);
+check("dots jump to slide", new RegExp(`Review ${last + 1} of`).test(dotLive), dotLive);
 
 const heights = [];
-for (let i = 0; i < 6; i += 1) {
+for (let i = 0; i < dotCount; i += 1) {
   await js(`__c().querySelectorAll("li button")[${i}].click()`);
   await sleep(700);
   heights.push(await js("__cardH()"));
@@ -236,8 +245,7 @@ check(
 check("lenis off", rm.lenis === false);
 await js("__show(__c())");
 const rmFirst = await js("__live()");
-await sleep(8000);
-check("autoplay off", rmFirst === (await js("__live()")), rmFirst);
+check("autoplay off", !(await movedWithin(9000)), rmFirst);
 
 /* ---------------------------------------------------- route + scroll ---- */
 console.log("\nroute scrub + layout stability (1440px)");

@@ -114,6 +114,9 @@ export function Testimonials() {
   };
 
   const current = items[index];
+  // A review with no photo gets the full width rather than a grey box where a
+  // face should be: some students are happy to be quoted but not pictured.
+  const hasPhoto = Boolean(current.photo);
 
   return (
     <section
@@ -143,7 +146,8 @@ export function Testimonials() {
           </p>
         </div>
 
-        {/* TODO: replace with real photos + quotes in /data/testimonials.json */}
+        {/* Real reviews, in the students' own words. Add more — with or
+            without a photo — in /data/testimonials.json. */}
         <div
           data-anim-item
           role="region"
@@ -172,26 +176,30 @@ export function Testimonials() {
         >
           {/* Fixed height, so a long quote never resizes the carousel. */}
           <div className="grid gap-5 sm:gap-6 lg:grid-cols-12 lg:items-stretch">
-            <div
-              ref={photoRef}
-              className="relative overflow-hidden rounded-2xl border border-hairline bg-muted lg:col-span-5 lg:h-[23rem]"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element -- static
-                  export; photos are swapped by hand in the JSON. */}
-              <img
-                key={current.photo}
-                src={current.photo ?? "/assets/testimonials/placeholder-1.svg"}
-                alt=""
-                width={480}
-                height={600}
-                decoding="async"
-                className="aspect-4/5 size-full object-cover sm:aspect-video lg:aspect-auto lg:h-full"
-              />
-            </div>
+            {hasPhoto && (
+              <div
+                ref={photoRef}
+                className="relative overflow-hidden rounded-2xl border border-hairline bg-muted lg:col-span-5 lg:h-[23rem]"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- static
+                    export; photos are swapped by hand in the JSON. */}
+                <img
+                  key={current.photo}
+                  src={current.photo}
+                  alt=""
+                  width={480}
+                  height={600}
+                  decoding="async"
+                  className="aspect-4/5 size-full object-cover sm:aspect-video lg:aspect-auto lg:h-full"
+                />
+              </div>
+            )}
 
             <div
               ref={cardRef}
-              className="card-surface flex min-h-[17rem] flex-col justify-between p-6 sm:min-h-[15rem] lg:col-span-7 lg:h-[23rem] lg:p-9"
+              className={`card-surface flex min-h-[17rem] flex-col justify-between p-6 sm:min-h-[15rem] lg:h-[23rem] lg:p-9 ${
+                hasPhoto ? "lg:col-span-7" : "lg:col-span-12"
+              }`}
             >
               <div>
                 {typeof current.rating === "number" && (
@@ -212,7 +220,11 @@ export function Testimonials() {
                   </p>
                 )}
 
-                <blockquote className="mt-5 line-clamp-5 text-[1.08rem] leading-[1.6] text-ink sm:text-[1.2rem] lg:line-clamp-4 lg:text-[1.35rem] lg:leading-[1.5]">
+                <blockquote
+                  className={`mt-5 line-clamp-5 text-[1.08rem] leading-[1.6] text-ink sm:text-[1.2rem] lg:text-[1.35rem] lg:leading-[1.5] ${
+                    hasPhoto ? "lg:line-clamp-4" : "lg:line-clamp-3"
+                  }`}
+                >
                   &ldquo;{current.quote}&rdquo;
                 </blockquote>
               </div>

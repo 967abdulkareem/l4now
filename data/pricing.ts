@@ -12,18 +12,10 @@
  * that opens WhatsApp with the package name pre-filled, instead of a blank or
  * broken figure. Replace the value with a string like "£450" when known.
  *
- * ── Adding automatic transmission ──────────────────────────────────────────
- * Whether automatic is offered, and at what rate, is not confirmed. The
- * `transmission` field exists for it and is deliberately unset everywhere —
- * with it unset a card says nothing about gearbox, which is the honest
- * default.
- *
- * To offer both, either:
- *   a) set `transmission: "manual"` on the existing lesson entries and add
- *      matching entries with `transmission: "automatic"` and their own price;
- *      or
- *   b) if the rate is identical, set `transmission: "both"` on the entry and
- *      the card will say it covers manual and automatic.
+ * ── Transmission ───────────────────────────────────────────────────────────
+ * Manual and automatic are taught at the same rate, so the hourly entries
+ * carry `transmission: "both"` and say so on the card. If the rates ever
+ * diverge, split them into separate entries with "manual" and "automatic".
  */
 
 /** Sentinel for a price that has not been supplied yet. */
@@ -54,6 +46,7 @@ export const pricing: PriceItem[] = [
     subtitle: "Your introduction to the road",
     price: "£30",
     unit: "per hour",
+    transmission: "both",
     badge: "Intro offer",
     originalPrice: "£37",
     note: "One hour with a DVSA-approved instructor (ADI), in a dual-controlled car. Somewhere quiet to start, and no pressure to book anything further.",
@@ -65,6 +58,7 @@ export const pricing: PriceItem[] = [
     subtitle: "Pay as you go",
     price: "£37",
     unit: "per hour",
+    transmission: "both",
     note: "Book one at a time or several in a week. Pick-up and drop-off are included, and you keep the same instructor throughout.",
     ctaLabel: "Book a lesson",
   },

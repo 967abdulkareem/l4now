@@ -45,6 +45,10 @@ export const site = {
     },
   },
 
+  /**
+   * TODO: confirm these with the instructor. They are a plausible working
+   * week, not a stated one, and should not go live unchecked.
+   */
   hours: [
     { days: "Monday – Friday", time: "07:00 – 20:00" },
     { days: "Saturday", time: "08:00 – 18:00" },
@@ -61,9 +65,13 @@ export const site = {
     "Pick-up and drop-off included",
   ],
 
-  /** One line instead of a coverage table — lessons cover the whole area. */
+  /**
+   * One line instead of a coverage table. Manchester and Cheetham Hill are
+   * confirmed by students who passed there; TODO: add the other test centres
+   * once the instructor lists them.
+   */
   coverage:
-    "Lessons cover the whole local area, with pick-up and drop-off included at no extra cost.",
+    "Lessons across Manchester and the surrounding areas, including tests at Cheetham Hill, with pick-up and drop-off included.",
 
   /**
    * The courses the GPS route travels past. `price` is deliberately null
@@ -152,11 +160,11 @@ export const site = {
     },
     {
       q: "Manual or automatic — which should I choose?",
-      a: "Automatic is usually quicker to learn and fine if you never intend to drive a manual. A manual licence covers both. If you are unsure, say so when you enquire and we will talk it through.",
+      a: "Automatic is usually quicker to learn and fine if you never intend to drive a manual. A manual licence covers both. Either way the hourly rate is the same, so choose the one you want to drive — and if you are unsure, say so when you enquire and we will talk it through.",
     },
     {
       q: "Do you pick me up from home?",
-      a: "Yes, anywhere inside our coverage areas, at no extra cost. Home, work, college or the station — whatever is easiest that day.",
+      a: "Yes, anywhere across Manchester and the surrounding areas, at no extra cost. Home, work, college or the station — whatever is easiest that day.",
     },
     {
       q: "What happens in the first lesson?",

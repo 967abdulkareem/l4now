@@ -1,38 +1,12 @@
 [
   {
-    "name": "Student Name",
-    "photo": "/assets/testimonials/placeholder-1.svg",
-    "rating": 5,
-    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+    "name": "Maddie B",
+    "quote": "I passed my test after just 2 weeks of lessons — something I never thought would be possible. Kais is incredibly patient, supportive, and explains everything in a way that just clicks. He made me feel genuinely confident and comfortable behind the wheel.",
+    "passedDate": "Passed in 2 weeks · Manchester"
   },
   {
-    "name": "Student Name",
-    "photo": "/assets/testimonials/placeholder-2.svg",
-    "rating": 5,
-    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
-  },
-  {
-    "name": "Student Name",
-    "photo": "/assets/testimonials/placeholder-3.svg",
-    "rating": 5,
-    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
-  },
-  {
-    "name": "Student Name",
-    "photo": "/assets/testimonials/placeholder-4.svg",
-    "rating": 5,
-    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
-  },
-  {
-    "name": "Student Name",
-    "photo": "/assets/testimonials/placeholder-5.svg",
-    "rating": 5,
-    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
-  },
-  {
-    "name": "Student Name",
-    "photo": "/assets/testimonials/placeholder-6.svg",
-    "rating": 5,
-    "quote": "Replace this with a short quote from your student — keep it under 2 sentences."
+    "name": "Zoë Anderson",
+    "quote": "I've had three very good driving instructors in my time learning — and I have to say that Kais has been the best of them all. He told me he wouldn't just teach me to pass the test, but how to become a confident, capable driver. He delivered on exactly that. I passed first time at Cheetham Hill.",
+    "passedDate": "Passed first time · Cheetham Hill Test Centre"
   }
 ]
