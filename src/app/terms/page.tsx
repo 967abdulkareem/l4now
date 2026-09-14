@@ -26,8 +26,9 @@ export default function Terms() {
 
       <h2>Prices and payment</h2>
       <p>
-        Prices are confirmed when you book — this site does not publish a rate
-        card. Fill in the payment terms here before launch.
+        Hourly rates are published on the home page and confirmed with you
+        when the lesson is agreed. Payment is by bank transfer or cash, after
+        the booking is agreed — no deposit is taken to hold a slot.
       </p>
       <p>
         Theory and practical test fees are paid to the DVSA directly and are not

@@ -241,13 +241,31 @@ export function RouteJourney({ children }: { children: ReactNode }) {
             .map((c) => box(c, wrapRect))
             .filter((b): b is Box => Boolean(b));
 
-          rects.forEach((c) => {
-            // A small bend as the dot draws level with each card. It stays
-            // inside the reserved gutter, so it never reaches the card.
-            pts.push([laneX - 6, c.top + c.h * 0.3]);
-            pts.push([laneX + 6, c.top + c.h * 0.5]);
-            pts.push([laneX - 6, c.top + c.h * 0.7]);
+          // The cards are stacked one per row, so the line squares off around
+          // them: down one side of a card, across the gap below it, down the
+          // other side of the next. The left run sits in the reserved gutter;
+          // the right one sits in the shell's own padding, clear of the card
+          // edge by more than the stroke. One crossing per gap, so the shape
+          // reads as a square wave rather than a ladder.
+          const xLeft = laneX;
+          const xRight = W - 12;
+          let x = xLeft;
+
+          rects.forEach((c, i) => {
+            const turn = c.bottom + 18;
+            pts.push([x, turn]);
+            if (i < rects.length - 1) {
+              x = x === xLeft ? xRight : xLeft;
+              pts.push([x, turn]);
+            }
           });
+
+          // Back into the gutter for the run down to the booking form.
+          if (rects.length && x !== xLeft) {
+            const out = rects[rects.length - 1].bottom + 18;
+            pts.push([xRight, out]);
+            pts.push([xLeft, out]);
+          }
 
           if (grid) pts.push([laneX, grid.bottom + 40]);
           pts.push([laneX, finish.cy]);

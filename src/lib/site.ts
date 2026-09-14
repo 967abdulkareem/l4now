@@ -45,15 +45,7 @@ export const site = {
     },
   },
 
-  /**
-   * TODO: confirm these with the instructor. They are a plausible working
-   * week, not a stated one, and should not go live unchecked.
-   */
-  hours: [
-    { days: "Monday – Friday", time: "07:00 – 20:00" },
-    { days: "Saturday", time: "08:00 – 18:00" },
-    { days: "Sunday", time: "09:00 – 16:00" },
-  ],
+  hours: [{ days: "Monday – Sunday", time: "06:00 – 16:00" }],
 
   /**
    * Facts shown under the hero buttons. Deliberately not a restatement of the
@@ -66,12 +58,11 @@ export const site = {
   ],
 
   /**
-   * One line instead of a coverage table. Manchester and Cheetham Hill are
-   * confirmed by students who passed there; TODO: add the other test centres
-   * once the instructor lists them.
+   * One line instead of a coverage table. No test centre is named: learners
+   * book the centre that suits them and we teach towards it.
    */
   coverage:
-    "Lessons across Manchester and the surrounding areas, including tests at Cheetham Hill, with pick-up and drop-off included.",
+    "Lessons across Manchester and the surrounding areas, with pick-up and drop-off included. You choose your test centre and we prepare you for it.",
 
   /**
    * The courses the GPS route travels past. `price` is deliberately null
@@ -167,12 +158,16 @@ export const site = {
       a: "Yes, anywhere across Manchester and the surrounding areas, at no extra cost. Home, work, college or the station — whatever is easiest that day.",
     },
     {
+      q: "Which test centre will I use?",
+      a: "Whichever one you want. You book the test, and we spend the lessons before it on the roads, junctions and manoeuvres that centre is known for.",
+    },
+    {
       q: "What happens in the first lesson?",
       a: "We start somewhere quiet, go through the controls at a standstill, then move away and stop a few times. There is no expectation beyond that.",
     },
     {
       q: "How much do lessons cost?",
-      a: "Prices are being confirmed. Ring or send an enquiry and we will give you the current rate for the lessons you are after, with nothing to pay up front.",
+      a: "Hourly rates are on this page, and the first hour is £30. Pay by bank transfer or cash once the lesson is agreed on WhatsApp — there is no deposit and nothing to pay up front.",
     },
     {
       q: "Can I use your car for the driving test?",
