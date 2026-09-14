@@ -221,6 +221,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           // a portrait window — then one reserved gutter down the left-hand
           // side, with a small bend beside each card. Never over the content.
           const lane = get("[data-lane='left']");
+          const laneR = get("[data-lane='right']");
           const laneX = lane ? lane.cx : 24;
           const grid = get("[data-course-grid]");
 
@@ -248,13 +249,17 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           // edge by more than the stroke. One crossing per gap, so the shape
           // reads as a square wave rather than a ladder.
           const xLeft = laneX;
-          const xRight = W - 12;
+          const xRight = laneR ? laneR.cx : W - 14;
           let x = xLeft;
 
           rects.forEach((c, i) => {
-            const turn = c.bottom + 18;
+            const next = rects[i + 1];
+            // Cross in the middle of the gap, not against the card, so the
+            // turn reads as part of the wave rather than a box drawn round
+            // the card.
+            const turn = next ? (c.bottom + next.top) / 2 : c.bottom + 26;
             pts.push([x, turn]);
-            if (i < rects.length - 1) {
+            if (next) {
               x = x === xLeft ? xRight : xLeft;
               pts.push([x, turn]);
             }
@@ -262,7 +267,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
 
           // Back into the gutter for the run down to the booking form.
           if (rects.length && x !== xLeft) {
-            const out = rects[rects.length - 1].bottom + 18;
+            const out = rects[rects.length - 1].bottom + 26;
             pts.push([xRight, out]);
             pts.push([xLeft, out]);
           }

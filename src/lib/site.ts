@@ -167,7 +167,7 @@ export const site = {
     },
     {
       q: "How much do lessons cost?",
-      a: "Lessons are booked as sessions: 1½ hours at £53 or 2 hours at £70, which is about £35 an hour. Motorway lessons start at £40 an hour. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
+      a: "Lessons start at £35 an hour and are booked as 1½ hour or 2 hour sessions; motorway lessons start at £40 an hour. We confirm the price for the session you want when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
     },
     {
       q: "Can I use your car for the driving test?",
@@ -201,7 +201,7 @@ export const site = {
   booking: {
     lessonTypes: ["Beginner", "Refresher", "Test prep", "Motorway"],
     /** Every lesson is booked as one of these. Prices match data/pricing.ts. */
-    lessonLengths: ["1½ hours — £53", "2 hours — £70"],
+    lessonLengths: ["1½ hours", "2 hours"],
     timeSlots: [
       "Early morning (06:00 – 09:00)",
       "Morning (09:00 – 12:00)",

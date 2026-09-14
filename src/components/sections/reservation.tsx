@@ -27,9 +27,9 @@ export function Reservation() {
                 Ready for your next turn?
               </h2>
               <p data-anim-line className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
-                Lessons run 1½ hours (£53) or 2 hours (£70). Tell us which
-                suits and when, and we will come back with a slot — no
-                deposit, no card details, no obligation.
+                Lessons run 1½ hours or 2 hours. Tell us which suits and
+                when, and we will come back with a slot — no deposit, no card
+                details, no obligation.
               </p>
 
               <dl className="mt-9 flex flex-col gap-5 border-t border-hairline pt-7">

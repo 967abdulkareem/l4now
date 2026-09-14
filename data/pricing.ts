@@ -3,9 +3,9 @@
  * this file and needs no edits.
  *
  * ── Lesson length ──────────────────────────────────────────────────────────
- * Lessons are sold as 1½ hour (£53) or 2 hour (£70) sessions, which is about
- * £35 an hour either way. The cards quote the hourly rate and name both
- * lengths; the booking form asks which one you want.
+ * Lessons are sold as 1½ hour or 2 hour sessions. The cards quote the hourly
+ * rate and name both lengths without pricing each one; the booking form asks
+ * which length you want.
  *
  * ── Prices still to confirm ────────────────────────────────────────────────
  * Any entry whose `price` is exactly TODO_PRICE renders an "Ask us" button
@@ -47,7 +47,7 @@ export const pricing: PriceItem[] = [
     price: "From £35",
     unit: "per hour",
     transmission: "both",
-    note: "Lessons run 1½ hours (£53) or 2 hours (£70) — long enough to drive somewhere worth driving. With a DVSA-approved instructor (ADI), in a dual-controlled car, pick-up and drop-off included.",
+    note: "Booked as a 1½ hour or 2 hour session — long enough to drive somewhere worth driving. With a DVSA-approved instructor (ADI), in a dual-controlled car, pick-up and drop-off included.",
     ctaLabel: "Book a lesson",
   },
   {
@@ -58,16 +58,6 @@ export const pricing: PriceItem[] = [
     unit: "per hour",
     note: "Joining, lane discipline, overtaking and leaving at speed, in a dual-controlled car. Booked as a 1½ or 2 hour session like any other lesson.",
     ctaLabel: "Ask about motorway lessons",
-  },
-  {
-    id: "standard-lesson",
-    name: "Standard lesson",
-    subtitle: "Pay as you go",
-    price: "£37",
-    unit: "per hour",
-    transmission: "both",
-    note: "Booked as a 1½ hour (£53) or 2 hour (£70) session, one at a time or several in a week. Pick-up and drop-off are included, and you keep the same instructor throughout.",
-    ctaLabel: "Book a lesson",
   },
   {
     id: "standard-course",
