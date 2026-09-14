@@ -2,10 +2,10 @@
  * Every price on the site. Change the figures here — the layout reads from
  * this file and needs no edits.
  *
- * ── Removing the intro offer ────────────────────────────────────────────────
- * Delete the `originalPrice` and `badge` fields from the "first-lesson" entry.
- * The card then shows £30 as a plain price, with no strike-through and no
- * "Intro offer" flag. Nothing else needs touching.
+ * ── Lesson length ──────────────────────────────────────────────────────────
+ * Lessons are sold as 1½ hour (£53) or 2 hour (£70) sessions, which is about
+ * £35 an hour either way. The cards quote the hourly rate and name both
+ * lengths; the booking form asks which one you want.
  *
  * ── Prices still to confirm ────────────────────────────────────────────────
  * Any entry whose `price` is exactly TODO_PRICE renders an "Ask us" button
@@ -41,16 +41,23 @@ export type PriceItem = {
 
 export const pricing: PriceItem[] = [
   {
-    id: "first-lesson",
-    name: "First lesson",
-    subtitle: "Your introduction to the road",
-    price: "£30",
+    id: "driving-lessons",
+    name: "Driving lessons",
+    subtitle: "Every lesson, every level",
+    price: "From £35",
     unit: "per hour",
     transmission: "both",
-    badge: "Intro offer",
-    originalPrice: "£37",
-    note: "One hour with a DVSA-approved instructor (ADI), in a dual-controlled car. Somewhere quiet to start, and no pressure to book anything further.",
-    ctaLabel: "Book your first lesson",
+    note: "Lessons run 1½ hours (£53) or 2 hours (£70) — long enough to drive somewhere worth driving. With a DVSA-approved instructor (ADI), in a dual-controlled car, pick-up and drop-off included.",
+    ctaLabel: "Book a lesson",
+  },
+  {
+    id: "motorway",
+    name: "Motorway lesson",
+    subtitle: "Confidence at speed",
+    price: "From £40",
+    unit: "per hour",
+    note: "Joining, lane discipline, overtaking and leaving at speed, in a dual-controlled car. Booked as a 1½ or 2 hour session like any other lesson.",
+    ctaLabel: "Ask about motorway lessons",
   },
   {
     id: "standard-lesson",
@@ -59,7 +66,7 @@ export const pricing: PriceItem[] = [
     price: "£37",
     unit: "per hour",
     transmission: "both",
-    note: "Book one at a time or several in a week. Pick-up and drop-off are included, and you keep the same instructor throughout.",
+    note: "Booked as a 1½ hour (£53) or 2 hour (£70) session, one at a time or several in a week. Pick-up and drop-off are included, and you keep the same instructor throughout.",
     ctaLabel: "Book a lesson",
   },
   {
@@ -102,4 +109,4 @@ export const pricing: PriceItem[] = [
 
 /** Small print shown under the grid. */
 export const pricingNote =
-  "Prices may vary by area and availability. Confirmed when you book.";
+  "Lessons are booked as 1½ hour or 2 hour sessions. Prices may vary by area and availability, and are confirmed when you book — pay by bank transfer or cash once the lesson is agreed, with no deposit.";

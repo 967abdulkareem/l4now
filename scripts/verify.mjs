@@ -108,7 +108,7 @@ const reduce = (on) =>
 const HELPERS = [
   'window.__c = () => document.querySelector("[aria-roledescription=\\"carousel\\"]");',
   'window.__live = () => __c().querySelector("[aria-live]").textContent.trim();',
-  'window.__cardH = () => Math.round(__c().querySelector(".card-surface").getBoundingClientRect().height);',
+  'window.__cardH = () => Math.round(__c().querySelector("[data-quote]").getBoundingClientRect().height);',
   'window.__btn = (re) => [...__c().querySelectorAll("button")].find((b) => new RegExp(re).test(b.getAttribute("aria-label") || ""));',
   'window.__over = (type) => { const c = __c(); const outside = document.body; c.dispatchEvent(new MouseEvent(type, { bubbles: true, relatedTarget: outside })); };',
   'window.__focusEvt = (type, el) => el.dispatchEvent(new FocusEvent(type, { bubbles: true }));',

@@ -27,7 +27,8 @@ export function Reservation() {
                 Ready for your next turn?
               </h2>
               <p data-anim-line className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
-                Tell us when suits and we will come back with a slot. No
+                Lessons run 1½ hours (£53) or 2 hours (£70). Tell us which
+                suits and when, and we will come back with a slot — no
                 deposit, no card details, no obligation.
               </p>
 

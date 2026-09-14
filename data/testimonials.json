@@ -1,12 +1,107 @@
 [
   {
     "name": "Maddie B",
-    "quote": "I passed my test after just 2 weeks of lessons — something I never thought would be possible. Kais is incredibly patient, supportive, and explains everything in a way that just clicks. He made me feel genuinely confident and comfortable behind the wheel.",
+    "quote": "I honestly can't recommend Kais enough as a driving instructor! I passed my test after just 2 weeks of lessons, which I never thought would be possible. Kais is incredibly patient, supportive, and explains everything in a way that just clicks. He didn't just teach me how to pass the test — he made me feel genuinely confident and comfortable behind the wheel. Every lesson was calm, focused, and encouraging, and he always pushed me just the right amount to improve. If you're looking for an instructor who truly cares about your progress and builds your confidence from day one, Kais is the one. Thank you so much for everything!",
     "passedDate": "Passed in 2 weeks · Manchester"
   },
   {
     "name": "Zoë Anderson",
     "quote": "I've had three very good driving instructors in my time learning — and I have to say that Kais has been the best of them all. He told me he wouldn't just teach me to pass the test, but how to become a confident, capable driver. He delivered on exactly that. I passed first time at Cheetham Hill.",
     "passedDate": "Passed first time · Cheetham Hill Test Centre"
+  },
+  {
+    "name": "Basim",
+    "quote": "I had around 10 hours of lessons with Qaisar Khan, and In just 2 weeks, he got me fully prepared for my driving test, and I passed with 0 minors. Qaisar is super patient and supportive. He focused on the areas I struggled with, like rules and manoeuvres, and explained everything clearly. He also made sure I felt confident and in control of the car. I'd definitely recommend him to anyone looking for lessons — he's a great instructor, and his car is perfect for learning. Thanks, Qaisar",
+    "passedDate": "Passed with 0 minors in 2 weeks"
+  },
+  {
+    "name": "Khadra Abdillahi",
+    "quote": "I found my instructor last minute, less than a week before my test, and Kais was absolutely amazing! He helped refresh my memory, build my confidence and prepare me for my test. I'm so grateful for his patience and support — I passed! Definitely recommend!",
+    "passedDate": "Passed · Private lessons"
+  },
+  {
+    "name": "Matt",
+    "quote": "Drove with Kais for four/five months and I can say he is a great teacher. Really wants you to push yourself without pressure and learn how to drive well. He is very engaged with teaching and tries to find a way to communicate lessons across to your needs, my favourite is the toy cars to show you how to do the manoeuvres. Very flexible and open, couldn't recommend him enough. I also passed first time with him.",
+    "passedDate": "Passed first time · Adult lessons"
+  },
+  {
+    "name": "Subramaniam Ramanathan",
+    "quote": "So, I had Mr. Kais Alsarori as my instructor for manual driving lessons. One of the best instructors out there. Extremely patient, always has a method to approach all the driving situations that one might encounter, with very simple solutions to all of them. Encouraged me throughout and the habit of doing commentary while driving really helped me pass my practical test today with only 3 minors. He has a good collection of videos and illustrations to tackle tricky roundabouts. And made an assessment of my driving capability before the test, gave me a catalogue of the approximate number of lessons I would need and did good mock tests before my test. Kudos to Mr. Kais for helping me pass my driving test.",
+    "passedDate": "Passed with 3 minors · Private lessons"
+  },
+  {
+    "name": "Izah Bhatti",
+    "quote": "I had a great experience learning to drive with my instructor, Kais. He was patient, professional, and always explained everything clearly, which really helped build my confidence. He was also very flexible with lesson times and always tried to fit lessons around my schedule, which I really appreciated. He was encouraging, supportive, and gave helpful feedback that made it easy to improve after each lesson. I would definitely recommend him to anyone looking for a reliable instructor. Thank you for all your help!",
+    "passedDate": "Manchester"
+  },
+  {
+    "name": "Amitoj Bajwa",
+    "quote": "Thanks to Kais, I passed my test the first time. He's an exceptionally patient instructor who explains things perfectly. He has a great sense of humor that really eases the tension when you make a mistake, and he will happily repeat things as many times as it takes to understand something. Highly recommended!",
+    "passedDate": "Passed first time · Manchester"
+  },
+  {
+    "name": "Nabeel Shahzad",
+    "quote": "Kais is an outstanding driving instructor, and I couldn't have asked for a better person to guide me through my driving journey. Although I had been driving before starting lessons with him, Kais helped me improve my skills significantly and corrected many habits that I didn't even realize needed attention. He was always patient and supportive making every lesson both enjoyable and valuable. What I appreciate most is that Kais didn't just focus on helping me pass the driving test — he taught me how to be a safe, confident, and responsible driver in real life. Thanks to his guidance, I not only passed my test but also became a much better driver. I highly recommend Kais to anyone looking for an instructor who truly cares about their success and safety.",
+    "passedDate": "Passed · Manchester"
+  },
+  {
+    "name": "Naomi Chimoli",
+    "quote": "Had Kais as my driving instructor. Very kind and patient with learners and goes the extra mile to ensure you understand everything and are ready for your test. Would 100% recommend him. Exceptional service!",
+    "passedDate": "Manchester"
+  },
+  {
+    "name": "Nora",
+    "quote": "I definitely recommend!! my instructor was Kais and i had the best experience ever !! He was very reliable and professional, always on time and well prepared. What I appreciated most was how supportive he was, he really focused on building my confidence as well as my driving skills. I’d definitely recommend him to anyone learning to drive.",
+    "passedDate": "Manchester"
+  },
+  {
+    "name": "Tewodros Beyene",
+    "quote": "I had an excellent experience learning to drive with Kais. He demonstrated exceptional patience, extensive knowledge, and consistently made me feel safe and confident behind the wheel. His clear instructions and composed demeanor were particularly helpful in keeping me calm, even during more challenging lessons. I greatly appreciated how he tailored each session to address the specific areas where I needed improvement. Thanks to his expert guidance, I was able to pass my driving test on the first attempt. I highly recommend Kais to anyone seeking a professional, skilled, and supportive driving instructor.",
+    "passedDate": "Passed first time · Manchester"
+  },
+  {
+    "name": "Caterina Or Kam Fat",
+    "quote": "Passed first time with Kais. A very positive and supportive instructor from the start, he filled me with confidence, if I had any questions or worries he always encouraged me to get in touch. He went above and beyond in making sure I passed!",
+    "passedDate": "Passed first time · Manchester"
+  },
+  {
+    "name": "Megan Tanner",
+    "quote": "Thanks kais! I would like to say a massive thank you to kais who I passed my test with! He has been nothing but patient and helpful throughout my lessons. He has great knowledge in what he does and nothing is to much for him, no matter how many questions I asked he alway took the time to make sure I understood and was confident in what I was doing. Would really recommend him to anyone! Thank you.",
+    "passedDate": "Passed · Manchester"
+  },
+  {
+    "name": "Aman Gupta",
+    "quote": "I took manual driving lessons with Kais and had a fantastic experience! From day one, he was incredibly patient, friendly, and encouraging. He explained everything by breaking it down into simple, easy-to-follow steps, which made a huge difference in my learning. Even though I was a complete beginner with no driving experience, the way Kais taught never made me feel like I wouldn't pass. His calm and positive approach gave me so much confidence behind the wheel. He was always proactive and supportive, making sure I fully understood each concept. Thanks to his expert guidance, I passed my driving test on the first attempt after just a couple of months of lessons (a few times a week). I couldn't have asked for a better instructor — I highly recommend Kais to anyone looking to learn manual driving!",
+    "passedDate": "Passed first time · Manual lessons"
+  },
+  {
+    "name": "S",
+    "quote": "After having a few bad experiences with previous instructors, Kais really showed me what a good instructor should be like. He was patient, encouraging and always made me feel at ease during lessons. He really helped me build my confidence on the road and ultimately helped me secure a pass! I honestly couldn't have asked for a better driving instructor, I would 100% recommend him to anyone learning to drive.",
+    "passedDate": "Passed · Manchester"
+  },
+  {
+    "name": "Cameron Clark",
+    "quote": "I highly recommend Qais! The lessons were extremely helpful! All my lessons were fun and informative allowing me to refine my driving skills and make me a confident driver. Would definitely recommend!",
+    "passedDate": "Manchester"
+  },
+  {
+    "name": "Antonio Fernando Silva Pinto",
+    "quote": "Kais was a great driving instructor, clear and friendly, he made it easy to learn and pass.",
+    "passedDate": "Passed · Manchester"
+  },
+  {
+    "name": "Dav Assefa",
+    "quote": "Today i passed my practical driving test. instructor Kais i never forget your hard work and commitment that you being me success. My God blues you i appreciates it",
+    "passedDate": "Passed · Manchester"
+  },
+  {
+    "name": "Nagarjuna Nagabhiru",
+    "quote": "Thank you so much Kais Brother for ur wonderful training and building confidence in me. you are best person brother and you make me feel so comfortable and tought me a lot brother thanks for all ur support and lessons brother",
+    "passedDate": "Manchester"
+  },
+  {
+    "name": "Google review",
+    "quote": "I passed my driving test on the first attempt thanks to Kais. Kais is an outstanding instructor very patient, professional, and knowledgeable. He explains everything clearly, points out mistakes in a supportive way, and gives great tips that make driving feel much easier. What I really appreciated was how calm and encouraging he always was, which helped me build confidence behind the wheel. He focused not only on passing the test but also on ensuring I developed safe driving habits for the long term. The lessons were well-structured, flexible with scheduling, and great value for money. I highly recommend Kais to anyone who wants to become a safe and confident driver.",
+    "passedDate": "Passed first time · Manchester"
   }
 ]
