@@ -284,6 +284,16 @@ export function RouteJourney({ children }: { children: ReactNode }) {
         base!.setAttribute("d", d);
         done!.setAttribute("d", d);
 
+        // The SVG is in page pixels, so these are real widths, not units that
+        // scale with the viewport: on a phone the same 2.6px dashed line
+        // disappears next to 16px type, and the dot is easy to lose.
+        const phone = window.matchMedia("(max-width: 767px)").matches;
+        base!.setAttribute("stroke-width", phone ? "3.2" : "2.6");
+        base!.setAttribute("stroke-opacity", phone ? "0.45" : "0.28");
+        base!.setAttribute("stroke-dasharray", phone ? "9 8" : "7 7");
+        done!.setAttribute("stroke-width", phone ? "4.4" : "3.4");
+        gsap.set(dot!, { scale: phone ? 1.25 : 1, transformOrigin: "50% 50%" });
+
         finishMark!.setAttribute(
           "transform",
           `translate(${round(finish.cx)} ${round(finish.cy)})`,
@@ -335,6 +345,44 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           }
         }
         return best;
+      }
+
+      /**
+       * Scroll progress → distance along the path.
+       *
+       * The two are not the same thing. The phone route squares off around
+       * every card, so a third of its length is horizontal: mapped straight
+       * across, the dot spends that third travelling sideways while the page
+       * scrolls past it, and by the pricing grid it is a screen behind what
+       * you are reading. This weights each step by how far it moves *down*
+       * the page, with a little credit for sideways travel so the corners
+       * still animate, which keeps the dot level with the reading line at
+       * any width.
+       */
+      function buildProgressMap(path: SVGPathElement) {
+        const total = path.getTotalLength();
+        const STEPS = 400;
+        const cumulative = [0];
+        let prev = path.getPointAtLength(0);
+        for (let i = 1; i <= STEPS; i += 1) {
+          const p = path.getPointAtLength((total * i) / STEPS);
+          const travel = Math.abs(p.y - prev.y) + 0.18 * Math.abs(p.x - prev.x);
+          cumulative.push(cumulative[i - 1] + travel);
+          prev = p;
+        }
+        const span = cumulative[STEPS] || 1;
+
+        // 101 evenly spaced samples: enough to interpolate between without
+        // walking the path on every scroll event.
+        const table = new Array<number>(101);
+        let j = 0;
+        for (let k = 0; k <= 100; k += 1) {
+          const target = (k / 100) * span;
+          while (j < STEPS && cumulative[j + 1] < target) j += 1;
+          const step = cumulative[j + 1] - cumulative[j] || 1;
+          table[k] = (j + (target - cumulative[j]) / step) / STEPS;
+        }
+        return table;
       }
 
       const mm = gsap.matchMedia();
@@ -420,45 +468,55 @@ export function RouteJourney({ children }: { children: ReactNode }) {
         gsap.set(dot, { transformOrigin: "50% 50%" });
         applyStates(0);
 
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: {
-            // Tied to reading position: the dot sits level with whatever is
-            // in the middle of the viewport, and lands on the destination
-            // marker exactly as that marker reaches the middle.
-            trigger: root,
-            start: "top center",
-            endTrigger: "[data-route-anchor='finish']",
-            end: "center center",
-            // Exactly tied to scroll, so it reverses on the way back up with
-            // no lag and no drift at either end.
-            scrub: true,
-            onUpdate: (self) => applyStates(self.progress),
-            invalidateOnRefresh: true,
-            onRefresh: (self) => {
-              // The path is rebuilt from measured layout, so DrawSVG and
-              // MotionPath have to re-read it. `invalidate()` makes both
-              // plugins re-initialise against the new `d`.
-              layout();
-              self.animation?.invalidate();
-              applyStates(self.progress);
-            },
-          },
-        });
+        let progressMap = buildProgressMap(base);
+        const mapProgress = (p: number) => {
+          const at = gsap.utils.clamp(0, 1, p) * 100;
+          const i = Math.floor(at);
+          const a = progressMap[i] ?? p;
+          const b = progressMap[Math.min(100, i + 1)] ?? a;
+          return a + (b - a) * (at - i);
+        };
 
-        // The route draws itself with DrawSVG and the dot rides the same
-        // path with MotionPath, both on this one scrubbed timeline — so they
-        // cannot drift apart, and scrolling up reverses both.
+        // The route draws itself with DrawSVG and the dot rides the same path
+        // with MotionPath, on one paused timeline — so they cannot drift
+        // apart, and the timeline is scrubbed by hand rather than by
+        // ScrollTrigger so the mapping above can sit in between.
+        const tl = gsap.timeline({ paused: true, defaults: { ease: "none" } });
         tl.fromTo(
           done,
           { drawSVG: "0% 0%" },
           { drawSVG: "0% 100%", duration: 1 },
           0,
-        ).to(
-          dot,
-          { motionPath: { path: base }, duration: 1 },
-          0,
-        );
+        ).to(dot, { motionPath: { path: base }, duration: 1 }, 0);
+
+        const render = (scrolled: number) => {
+          const at = mapProgress(scrolled);
+          tl.progress(at);
+          applyStates(at);
+        };
+
+        const trigger = ScrollTrigger.create({
+          // Tied to reading position: the dot sits level with whatever is in
+          // the middle of the viewport, and lands on the destination marker
+          // exactly as that marker reaches the middle.
+          trigger: root,
+          start: "top center",
+          endTrigger: "[data-route-anchor='finish']",
+          end: "center center",
+          onUpdate: (self) => render(self.progress),
+          invalidateOnRefresh: true,
+          onRefresh: (self) => {
+            // The path is rebuilt from measured layout, so DrawSVG and
+            // MotionPath have to re-read it, and the mapping has to be
+            // measured again against the new geometry.
+            layout();
+            tl.invalidate();
+            progressMap = buildProgressMap(base);
+            render(self.progress);
+          },
+        });
+
+        render(trigger.progress);
 
         // Anything that changes the page height moves every anchor the route
         // is built from: viewport resize, webfonts swapping in, an accordion

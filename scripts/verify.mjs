@@ -76,6 +76,10 @@ ws.addEventListener("message", (e) => {
 await send("Page.enable");
 await send("Runtime.enable");
 
+/* The dot is allowed to sit within a third of a screen of the middle: the
+   route bends around content, so it is never exactly level. */
+const innerHeightAllowance = 300;
+
 let failed = false;
 const check = (name, ok, detail = "") => {
   if (!ok) failed = true;
@@ -280,6 +284,43 @@ check(
 );
 check("route draws on scroll", scrub.drew > 10, `${scrub.drew} distinct dash states`);
 check("route reverses on scroll up", scrub.reversed && scrub.endMatchesStart);
+
+/* The dot should stay level with what you are reading, at any width: the
+   phone route is a third horizontal, so a naive length mapping leaves it a
+   screen behind by the pricing grid. */
+for (const width of [390, 1440]) {
+  await load("?nolenis=1", width);
+  const drift = await js(
+    [
+      "(async () => {",
+      "  const wait = () => new Promise((r) => setTimeout(r, 260));",
+      '  const dot = document.querySelector("[data-gps-dot]");',
+      // Only while the route is running: past the destination the dot parks
+      // there by design while the page scrolls on.
+      '  const finish = document.querySelector("[data-route-anchor=\\u0027finish\\u0027]");',
+      "  const max = Math.min(",
+      "    document.documentElement.scrollHeight - innerHeight,",
+      "    finish.getBoundingClientRect().top + scrollY - innerHeight / 2);",
+      "  let worst = 0;",
+      "  for (let i = 3; i <= 18; i++) {",
+      "    window.scrollTo(0, (max * i) / 20);",
+      "    await wait();",
+      "    const r = dot.getBoundingClientRect();",
+      "    if (r.height === 0) continue;",
+      "    const off = Math.abs(r.top + r.height / 2 - innerHeight / 2);",
+      "    if (off > worst) worst = off;",
+      "  }",
+      "  window.scrollTo(0, 0);",
+      "  return Math.round(worst);",
+      "})()",
+    ].join("\n"),
+  );
+  check(
+    `dot tracks the reading line at ${width}px`,
+    drift <= innerHeightAllowance,
+    `worst ${drift}px from centre`,
+  );
+}
 
 /* ----------------------------------------------------------- anchors ---- */
 console.log("\nanchor offsets (1440px)");

@@ -47,7 +47,7 @@ export const pricing: PriceItem[] = [
     price: "From £35",
     unit: "per hour",
     transmission: "both",
-    note: "Booked as a 1½ hour or 2 hour session — long enough to drive somewhere worth driving. With a DVSA-approved instructor (ADI), in a dual-controlled car, pick-up and drop-off included.",
+    note: "Flexible times and lessons with a DVSA-approved instructor (ADI), in a dual-controlled car. Somewhere quiet to start, and no pressure to book anything further.",
     ctaLabel: "Book a lesson",
   },
   {
