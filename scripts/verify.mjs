@@ -140,60 +140,27 @@ await load();
 await js(HELPERS);
 await js("__show(__c())");
 
-check("autoplay advances", await movedWithin(9000));
+check("nothing turns on its own", !(await movedWithin(9000)));
 
 const h1 = await js("__cardH()");
-
-/* Real mouse move over the carousel — React derives onMouseEnter from
-   delegated events, so a trusted pointer is the only honest test. */
-const mouse = async (type, y) => {
-  const at = await js(
-    '(() => { const r = __c().getBoundingClientRect(); return [Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2)]; })()',
-  );
-  await send("Input.dispatchMouseEvent", {
-    type: "mouseMoved",
-    x: at[0],
-    y: y ?? at[1],
-    buttons: 0,
-  });
-};
-await mouse("mouseMoved");
-await sleep(300);
-const held = await js("__live()");
-check("pauses on hover", !(await movedWithin(9000)), held);
-await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 2, y: 2, buttons: 0 });
-
-/* Everything below is deterministic only while the timer is stopped. */
-await js('__btn("slideshow").click()');
-await sleep(400);
-const pausedLabel = await js('__btn("slideshow").getAttribute("aria-label")');
-check("pause button toggles", /Play review/.test(pausedLabel), pausedLabel);
-const atPause = await js("__live()");
-check("paused stays put", !(await movedWithin(9000)), atPause);
+const atStart = await js("__live()");
 
 await js('__btn("Next review").click()');
-await sleep(800);
+await sleep(1600);
 const afterNext = await js("__live()");
-check("next button", afterNext !== atPause, afterNext);
+check("next button", afterNext !== atStart, afterNext);
 
 await js('__btn("Previous review").click()');
-await sleep(800);
-check("prev button", (await js("__live()")) === atPause, await js("__live()"));
+await sleep(1600);
+check("prev button", (await js("__live()")) === atStart, await js("__live()"));
 
 await js(
   '__c().focus(); __c().dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }))',
 );
-await sleep(800);
-check("arrow-key nav", (await js("__live()")) !== atPause);
+await sleep(1600);
+check("arrow-key nav", (await js("__live()")) !== atStart);
 await js('__c().dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }))');
-await sleep(800);
-
-/* Resume, then hold it with keyboard focus. */
-await js('__btn("slideshow").click()');
-await sleep(400);
-const focusHeld = await js('__focusEvt("focusin", __c().querySelector("button")); __live()');
-check("pauses on keyboard focus", !(await movedWithin(9000)), focusHeld);
-await js('__focusEvt("focusout", __c().querySelector("button"))');
+await sleep(1600);
 
 const beforeSwipe = await js("__live()");
 await js(
@@ -204,20 +171,20 @@ await js(
     'fire("touchstart", 300); fire("touchend", 150); 1',
   ].join("\n"),
 );
-await sleep(800);
+await sleep(1600);
 check("swipe advances", beforeSwipe !== (await js("__live()")), beforeSwipe);
 
 const dotCount = await js('__c().querySelectorAll("li button").length');
 const last = dotCount - 1;
 await js(`__c().querySelectorAll("li button")[${last}].click()`);
-await sleep(800);
+await sleep(1600);
 const dotLive = await js("__live()");
 check("dots jump to slide", new RegExp(`Review ${last + 1} of`).test(dotLive), dotLive);
 
 const heights = [];
 for (let i = 0; i < dotCount; i += 1) {
   await js(`__c().querySelectorAll("li button")[${i}].click()`);
-  await sleep(700);
+  await sleep(1500);
   heights.push(await js("__cardH()"));
 }
 check("no height jump between slides", new Set(heights).size === 1, heights.join(","));
@@ -249,7 +216,7 @@ check(
 check("lenis off", rm.lenis === false);
 await js("__show(__c())");
 const rmFirst = await js("__live()");
-check("autoplay off", !(await movedWithin(9000)), rmFirst);
+check("still nothing turns on its own", !(await movedWithin(9000)), rmFirst);
 
 /* ---------------------------------------------------- route + scroll ---- */
 console.log("\nroute scrub + layout stability (1440px)");

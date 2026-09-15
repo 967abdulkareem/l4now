@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import testimonials from "@data/testimonials.json";
@@ -18,14 +18,11 @@ type Testimonial = {
 const items = testimonials as Testimonial[];
 const count = items.length;
 
-/** Long enough to read the opening of a review without hurrying. */
-const INTERVAL = 7;
-
 /** Swipe distance, in px, before it counts as a deliberate gesture. */
 const SWIPE = 45;
 
-/** Circumference of the r=19 timer ring, for the dash maths. */
-const RING = 2 * Math.PI * 19;
+/** One turn of the deck. Long and eased, so it settles rather than snaps. */
+const TURN = 1.15;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -60,20 +57,16 @@ function offsetFrom(i: number, index: number) {
  * says there is more here than the one you are reading, which is the whole
  * point of the section.
  *
- * The autoplay timer is drawn as a ring around the pause button, and that
- * tween *is* the clock — when it fills, the deck turns. WCAG 2.2.2 asks for a
- * way to pause anything that moves on its own; drawing the timer makes the
- * thing being paused legible rather than invisible.
+ * Nothing moves on its own: the deck turns when the reader turns it, with
+ * the arrows, the dots, a swipe or the arrow keys. That also means there is
+ * no autoplay to pause, which is the simplest way to satisfy WCAG 2.2.2.
  */
 export function Testimonials() {
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [held, setHeld] = useState(false);
   const [reduced, setReduced] = useState(false);
 
   const scope = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLUListElement>(null);
-  const ringRef = useRef<SVGCircleElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
   const touchX = useRef<number | null>(null);
 
@@ -82,13 +75,9 @@ export function Testimonials() {
     [],
   );
 
-  // Autoplay is off by default when the visitor asks for reduced motion.
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      setReduced(mq.matches);
-      if (mq.matches) setPlaying(false);
-    };
+    const sync = () => setReduced(mq.matches);
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
@@ -123,8 +112,14 @@ export function Testimonials() {
             rotationY: off === 0 ? 0 : Math.sign(off) * -16,
             autoAlpha: shown ? (away === 0 ? 1 : away === 1 ? 0.62 : 0.28) : 0,
             zIndex: 10 - away,
-            duration: 0.75,
-            ease: "power3.out",
+            duration: TURN,
+            // power2 rather than power3: the same distance covered with less
+            // of it crammed into the first few frames, which is what makes a
+            // turn feel slow and deliberate rather than merely long.
+            ease: "power2.out",
+            // The outer cards settle a beat after the middle one, so the deck
+            // arrives as a group instead of snapping into place at once.
+            delay: away * 0.05,
             overwrite: "auto" as const,
           };
 
@@ -144,52 +139,16 @@ export function Testimonials() {
 
       if (!reduced && countRef.current) {
         gsap.from(countRef.current, {
-          yPercent: -55,
+          yPercent: -45,
           autoAlpha: 0,
-          duration: 0.45,
-          ease: "power3.out",
+          duration: 0.6,
+          ease: "power2.out",
         });
       }
 
       return () => mm.revert();
     },
     { dependencies: [index, reduced], scope, revertOnUpdate: true },
-  );
-
-  /**
-   * The timer ring *is* the autoplay clock: when it completes, the deck
-   * turns. One tween, so the thing on screen and the thing driving the
-   * carousel cannot drift apart, and pausing is `tween.pause()` rather than a
-   * separate interval to keep in sync.
-   */
-  useGSAP(
-    () => {
-      const ring = ringRef.current;
-      if (!ring || reduced) return;
-
-      const tween = gsap.fromTo(
-        ring,
-        { strokeDashoffset: RING },
-        {
-          strokeDashoffset: 0,
-          duration: INTERVAL,
-          ease: "none",
-          onComplete: () => go(index + 1),
-        },
-      );
-      if (!playing || held) tween.pause();
-      return () => {
-        tween.kill();
-      };
-    },
-    // revertOnUpdate: without it the context is only cleaned up on unmount,
-    // so every pause would leave the previous timer running and the deck
-    // would turn on a tween nobody can see.
-    {
-      dependencies: [index, playing, held, reduced, go],
-      scope,
-      revertOnUpdate: true,
-    },
   );
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -213,8 +172,8 @@ export function Testimonials() {
       className="section-y overflow-hidden border-t border-hairline"
     >
       <div className="shell" ref={scope}>
-        <div className="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-12">
-          <div className="lg:col-span-7">
+        <div className="max-w-[40rem]">
+          <div>
             <p data-anim-line className="eyebrow">
               Student reviews
             </p>
@@ -234,19 +193,6 @@ export function Testimonials() {
             </p>
           </div>
 
-          {/* A count, not a score: nobody has been asked to leave a rating,
-              so there is no average to publish. */}
-          <p
-            data-anim-line
-            className="flex items-baseline gap-2 lg:col-span-4 lg:col-start-9 lg:justify-end"
-          >
-            <span className="display text-[2.6rem] leading-none text-brand">
-              {count}
-            </span>
-            <span className="text-[0.95rem] text-muted-foreground">
-              reviews, in their own words
-            </span>
-          </p>
         </div>
 
         {/* Add more reviews in /data/testimonials.json. */}
@@ -257,14 +203,6 @@ export function Testimonials() {
           aria-label="Student reviews"
           tabIndex={-1}
           onKeyDown={onKeyDown}
-          onMouseEnter={() => setHeld(true)}
-          onMouseLeave={() => setHeld(false)}
-          onFocusCapture={() => setHeld(true)}
-          onBlurCapture={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-              setHeld(false);
-            }
-          }}
           onTouchStart={(e) => {
             touchX.current = e.touches[0].clientX;
           }}
@@ -280,7 +218,7 @@ export function Testimonials() {
           <ul
             ref={stage}
             data-quote
-            className="relative h-[27rem] [perspective:1400px] sm:h-[25rem]"
+            className="relative h-[27rem] [perspective:1400px] sm:h-[26rem] lg:h-[28rem]"
           >
             {items.map((item, i) => {
               const { lead, rest } = splitQuote(item.quote);
@@ -309,7 +247,7 @@ export function Testimonials() {
                       its own line limit and the text is cut mid-line. */}
                   <div className="mt-4 min-h-0 flex-1 overflow-hidden">
                     {rest && (
-                      <p className="line-clamp-6 text-[0.95rem] leading-[1.6] text-ink-soft">
+                      <p className="line-clamp-5 text-[0.95rem] leading-[1.6] text-ink-soft lg:line-clamp-6">
                         {rest}
                       </p>
                     )}
@@ -337,52 +275,6 @@ export function Testimonials() {
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            {/* Pause/play, wrapped in the timer it controls. */}
-            <span className="relative grid size-12 place-items-center">
-              <svg
-                viewBox="0 0 44 44"
-                aria-hidden="true"
-                className="absolute inset-0 size-12 -rotate-90"
-              >
-                <circle
-                  cx="22"
-                  cy="22"
-                  r="19"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="text-ink/10"
-                />
-                <circle
-                  ref={ringRef}
-                  cx="22"
-                  cy="22"
-                  r="19"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray={RING}
-                  strokeDashoffset={RING}
-                  className="text-brand"
-                />
-              </svg>
-              <button
-                type="button"
-                onClick={() => setPlaying((v) => !v)}
-                aria-label={
-                  playing ? "Pause review slideshow" : "Play review slideshow"
-                }
-                className="relative grid size-9 place-items-center rounded-full bg-white text-ink transition-colors hover:text-brand"
-              >
-                {playing ? (
-                  <Pause className="size-4" aria-hidden="true" />
-                ) : (
-                  <Play className="size-4" aria-hidden="true" />
-                )}
-              </button>
-            </span>
-
             <button
               type="button"
               onClick={() => go(index - 1)}
