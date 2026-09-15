@@ -3,7 +3,6 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { withBase } from "@/lib/asset";
 import { site } from "@/lib/site";
 
 import "./globals.css";
@@ -41,27 +40,21 @@ export const metadata: Metadata = {
     url: site.url,
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    images: [
-      { url: withBase("/og.jpg"), width: 1200, height: 630, alt: site.name },
-    ],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: site.name }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    images: [{ url: withBase("/og.jpg"), alt: site.name }],
+    images: [{ url: "/og.jpg", alt: site.name }],
   },
   robots: { index: true, follow: true },
   icons: {
     icon: [
-      { url: withBase("/favicon-32.png"), sizes: "32x32", type: "image/png" },
-      {
-        url: withBase("/favicon-512.webp"),
-        sizes: "512x512",
-        type: "image/webp",
-      },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-512.webp", sizes: "512x512", type: "image/webp" },
     ],
-    apple: [{ url: withBase("/favicon-180.png"), sizes: "180x180" }],
+    apple: [{ url: "/favicon-180.png", sizes: "180x180" }],
   },
 };
 

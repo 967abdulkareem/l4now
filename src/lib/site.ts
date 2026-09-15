@@ -18,8 +18,7 @@ export const site = {
   tagline: "Learn • Practice • Succeed",
   description:
     "Patient, practical driving lessons. Progress at your pace, from your first turn to test day.",
-  // TODO: replace with the live domain once it is registered.
-  url: "https://l4now.example",
+  url: "https://l4now.com",
   locale: "en_GB",
 
   contact: {

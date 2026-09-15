@@ -1,5 +1,4 @@
 import { BrandLogo } from "@/components/brand-logo";
-import { withBase } from "@/lib/asset";
 import { site } from "@/lib/site";
 import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/whatsapp";
 
@@ -91,7 +90,7 @@ export function SiteFooter() {
             {site.legal.map((item) => (
               <li key={item.href}>
                 <a
-                  href={withBase(item.href as `/${string}`)}
+                  href={item.href}
                   className="text-[0.86rem] text-muted-foreground hover:text-ink hover:underline"
                 >
                   {item.label}

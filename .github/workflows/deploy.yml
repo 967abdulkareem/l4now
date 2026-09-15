@@ -28,11 +28,10 @@ jobs:
 
       - run: npm ci
 
+      # The site is served from the root of l4now.com. Nothing sets a base
+      # path: doing so points every /_next/ asset at a folder that only
+      # exists on the github.io URL.
       - name: Build static site
-        env:
-          # Project sites live at /<repo>. Delete this line if you are
-          # deploying to a custom domain or a <user>.github.io repo.
-          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
         run: npm run build
 
       # Stops Pages stripping files and folders that begin with an underscore.

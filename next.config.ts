@@ -1,30 +1,27 @@
 import type { NextConfig } from "next";
 
 /**
- * GitHub Pages serves a project site from https://<user>.github.io/<repo>/,
- * so every asset URL needs that prefix. The deploy workflow sets this for us;
- * locally it stays empty and the site runs at "/".
+ * The site is served from the root of l4now.com, so there is no base path and
+ * no asset prefix. Both were set once, for the <user>.github.io/<repo> URL,
+ * and left every /_next/ asset pointing at a repo-name folder that does not
+ * exist on the custom domain — the HTML loaded and nothing else did.
  *
- * Serving from a custom domain or the repo root? Leave it unset.
+ * Moving back to a repo sub-path means setting `basePath` and `assetPrefix`
+ * here AND prefixing every hand-written URL (Next does not rewrite those).
  */
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
 const nextConfig: NextConfig = {
   reactCompiler: true,
 
-  // Emits a plain folder of HTML/CSS/JS into ./out — which is what both the
-  // nginx container and GitHub Pages serve. No Node process in production.
+  // Emits a plain folder of HTML/CSS/JS into ./out, which is what GitHub
+  // Pages serves. No Node process in production.
   output: "export",
 
   // Static export has no image optimiser at runtime.
   images: { unoptimized: true },
 
-  // Every route is written as a folder with an index.html, which keeps nginx
-  // and GitHub Pages happy without rewrite rules.
+  // Every route is written as a folder with an index.html, which keeps
+  // GitHub Pages happy without rewrite rules.
   trailingSlash: true,
-
-  basePath: basePath || undefined,
-  assetPrefix: basePath || undefined,
 };
 
 export default nextConfig;
