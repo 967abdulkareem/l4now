@@ -30,17 +30,18 @@ export function MapArt({
   className,
   preserveAspectRatio = "xMidYMid slice",
   viewBox,
-  route = true,
+  roadClassName,
 }: {
   className?: string;
   preserveAspectRatio?: string;
   /** Crop window, for the narrow portrait framing. Defaults to the whole map. */
   viewBox?: string;
   /**
-   * Draw the wide primary road the GPS route follows. Off for the phone crop,
-   * where the route is not rendered and the road would read as a stray band.
+   * Classes for the primary road the GPS route follows. The phone crop hides
+   * it — no route is drawn there and the road reads as a stray band — but it
+   * stays in the markup so one map can serve both framings.
    */
-  route?: boolean;
+  roadClassName?: string;
 }) {
   return (
     <svg
@@ -103,46 +104,46 @@ export function MapArt({
           ))}
         </g>
 
-        {/* The primary road the route runs along. Omitted on the phone crop,
-            where no route is drawn and it would read as a stray band. */}
-        {route && (
-          <>
-            <path
-              d={ROUTE_D}
-              fill="none"
-              stroke="#ededed"
-              strokeWidth="26"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d={ROUTE_D}
-              fill="none"
-              stroke={STREET}
-              strokeWidth="21"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </>
-        )}
+        {/* The primary road the route runs along, the bridge where it crosses
+            the river and the junctions along it. One group, so the phone
+            framing can drop the lot with a class. */}
+        <g data-map-road className={roadClassName}>
+          <path
+            d={ROUTE_D}
+            fill="none"
+            stroke="#ededed"
+            strokeWidth="26"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d={ROUTE_D}
+            fill="none"
+            stroke={STREET}
+            strokeWidth="21"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
 
-        {/* Where the primary road crosses the river. */}
-        {route && BRIDGE && (
-          <g transform={`translate(${BRIDGE[0]} ${BRIDGE[1]}) rotate(${BRIDGE[2]})`}>
-            <rect x="-22" y="-15" width="44" height="30" rx="3" fill={STREET} />
-            <rect x="-22" y="-15" width="44" height="2" fill="#e3e3e3" />
-            <rect x="-22" y="13" width="44" height="2" fill="#e3e3e3" />
-          </g>
-        )}
+          {/* Where the primary road crosses the river. */}
+          {BRIDGE && (
+            <g
+              transform={`translate(${BRIDGE[0]} ${BRIDGE[1]}) rotate(${BRIDGE[2]})`}
+            >
+              <rect x="-22" y="-15" width="44" height="30" rx="3" fill={STREET} />
+              <rect x="-22" y="-15" width="44" height="2" fill="#e3e3e3" />
+              <rect x="-22" y="13" width="44" height="2" fill="#e3e3e3" />
+            </g>
+          )}
 
-        {/* Junctions where the route meets an arterial. */}
-        {route &&
-          JUNCTIONS.map(([x, y, r], i) => (
-          <g key={i}>
-            <circle cx={x} cy={y} r={r} fill="none" stroke={STREET} strokeWidth="12" />
-            <circle cx={x} cy={y} r={r - 6} fill={PARK} opacity="0.7" />
-          </g>
-        ))}
+          {/* Junctions where the road meets an arterial. */}
+          {JUNCTIONS.map(([x, y, r], i) => (
+            <g key={i}>
+              <circle cx={x} cy={y} r={r} fill="none" stroke={STREET} strokeWidth="12" />
+              <circle cx={x} cy={y} r={r - 6} fill={PARK} opacity="0.7" />
+            </g>
+          ))}
+        </g>
       </g>
 
       {/* ---- trees ---- */}

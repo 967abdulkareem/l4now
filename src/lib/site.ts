@@ -11,9 +11,6 @@
 
 import { WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from "./whatsapp";
 
-/** Shown wherever a price has not been supplied yet. */
-export const PRICE_TBC = "Price to be confirmed";
-
 export const site = {
   name: "L_4NOW Driving School",
   shortName: "L_4NOW",
@@ -55,65 +52,7 @@ export const site = {
   coverage:
     "Lessons across Manchester and the surrounding areas, with pick-up and drop-off included. You choose your test centre and we prepare you for it.",
 
-  /**
-   * The courses the GPS route travels past. `price` is deliberately null
-   * until real figures are supplied — the card then reads "Price to be
-   * confirmed" rather than inventing one.
-   */
-  courses: [
-    {
-      id: "first-lesson",
-      icon: "user",
-      name: "First lesson",
-      summary:
-        "Get a feel for the road and see how it goes. A relaxed introduction with a professional instructor, at your pace.",
-      price: null as string | null,
-      unit: null as string | null,
-      popular: false,
-      points: [
-        "Dual-controlled car",
-        "A quiet route to start on",
-        "No experience needed",
-      ],
-    },
-    {
-      id: "build-confidence",
-      icon: "chart",
-      name: "Build confidence",
-      summary:
-        "Develop your skills step by step with structured lessons. Gain independence, improve your technique and feel more at ease on the road.",
-      price: null as string | null,
-      unit: null as string | null,
-      popular: true,
-      /**
-       * Left null on purpose. Set it (e.g. "Most booked") only once there is
-       * evidence for the claim; the card shows a plain accent rule until then.
-       */
-      popularLabel: null as string | null,
-      points: [
-        "Manual or automatic",
-        "Junctions, roundabouts and town traffic",
-        "Progress reviewed each lesson",
-      ],
-    },
-    {
-      id: "test-preparation",
-      icon: "target",
-      name: "Test preparation",
-      summary:
-        "Focus on the skills, knowledge and confidence you need for your driving test. Tailored lessons to help you arrive ready.",
-      price: null as string | null,
-      unit: null as string | null,
-      popular: false,
-      points: [
-        "Mock tests on local routes",
-        "Manoeuvres and independent driving",
-        "Test-day planning",
-      ],
-    },
-  ],
-
-  /** The three stages, shown as a compact strip under the hero. */
+  /** The three stages the route travels through. */
   steps: [
     {
       id: "basics",

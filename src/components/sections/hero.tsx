@@ -21,21 +21,21 @@ export function Hero() {
       <div
         data-route-anchor="map"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 lg:inset-y-0 lg:right-0 lg:left-auto lg:z-auto lg:w-[62%]"
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden lg:inset-y-0 lg:right-0 lg:left-auto lg:z-auto lg:w-[62%]"
       >
-        {/* Phones: a dense residential crop, chosen because it reads as even
-            texture at portrait width — no park or water mass sits behind the
-            headline. The window is tight on purpose: cropped wider, the
-            streets shrink to a grey hatch and stop reading as a town. */}
+        {/* One map, two framings. The artwork is a few thousand elements, so
+            rendering it twice — once cropped for phones, once whole for wide
+            screens — doubled the page's HTML for markup that is hidden half
+            the time. Instead the phone framing is a CSS zoom on the same
+            element: same effect as a tighter viewBox, no second copy, and no
+            JavaScript deciding which to show.
+
+            The primary road goes with the wide framing. On the phone crop no
+            route is drawn over it and it reads as a stray band. */}
         <MapArt
-          route={false}
-          className="absolute inset-0 h-full w-full opacity-90 md:hidden"
-          viewBox="380 250 380 620"
-          preserveAspectRatio="xMidYMid slice"
+          className="absolute inset-0 h-full w-full origin-[42%_32%] scale-[1.65] opacity-90 md:origin-center md:scale-100 md:opacity-70 lg:opacity-100"
+          roadClassName="hidden md:block"
         />
-        {/* Tablets up: the desktop framing — full-bleed behind the copy until
-            there is room to put it beside the copy. */}
-        <MapArt className="absolute inset-0 hidden h-full w-full opacity-70 md:block lg:opacity-100" />
 
         {/* Scrims. Phones and tablets get a flat wash plus a fade behind the
             copy; wide screens keep the horizontal fade. */}

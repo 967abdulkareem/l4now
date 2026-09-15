@@ -300,6 +300,32 @@ for (const width of [390, 1440]) {
   );
 }
 
+/* The phone menu opens on a CSS grid-row transition and is inert while shut,
+   so it is worth checking it actually opens and cannot be tabbed into. */
+console.log("\nphone menu (390px)");
+await reduce(false);
+await load("", 390);
+const menu = await js(
+  [
+    "(async () => {",
+    '  const nav = document.getElementById("mobile-nav");',
+    "  const btn = document.querySelector('header button[aria-controls=\"mobile-nav\"]');",
+    "  const shut = { h: Math.round(nav.getBoundingClientRect().height), inert: nav.inert };",
+    "  btn.click();",
+    "  await new Promise((r) => setTimeout(r, 700));",
+    "  const open = { h: Math.round(nav.getBoundingClientRect().height), inert: nav.inert };",
+    "  btn.click();",
+    "  await new Promise((r) => setTimeout(r, 700));",
+    "  return { shut, open, again: Math.round(nav.getBoundingClientRect().height) };",
+    "})()",
+  ].join("\n"),
+);
+check(
+  "menu opens, closes and is inert while shut",
+  menu.shut.h === 0 && menu.shut.inert && menu.open.h > 200 && !menu.open.inert && menu.again === 0,
+  JSON.stringify(menu),
+);
+
 /* ----------------------------------------------------------- anchors ---- */
 console.log("\nanchor offsets (1440px)");
 for (const id of ["how", "pricing", "reviews", "faqs", "book"]) {

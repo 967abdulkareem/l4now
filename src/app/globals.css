@@ -206,9 +206,29 @@
   }
 }
 
+/* A single entrance, for content that replaces something in place. */
+@keyframes enter-soft {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.enter-soft {
+  animation: enter-soft 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:not(.lenis) {
     scroll-behavior: auto;
+  }
+
+  .enter-soft {
+    animation: none;
+  }
+
+  #mobile-nav {
+    transition: none;
   }
 }
 

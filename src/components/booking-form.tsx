@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { AlertCircle, MessageCircle } from "lucide-react";
 import { useId, useRef, useState } from "react";
 
@@ -178,14 +177,7 @@ export function BookingForm() {
 
   if (sentLink) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        role="status"
-        aria-live="polite"
-        className="mt-8"
-      >
+      <div role="status" aria-live="polite" className="enter-soft mt-8">
         <span className="grid size-11 place-items-center rounded-full bg-accent text-brand-deep">
           <MessageCircle className="size-5" aria-hidden="true" />
         </span>
@@ -224,7 +216,7 @@ export function BookingForm() {
           WhatsApp did not open? Message us directly on{" "}
           <span className="font-semibold text-ink">{WHATSAPP_DISPLAY}</span>.
         </p>
-      </motion.div>
+      </div>
     );
   }
 

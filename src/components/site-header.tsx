@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -88,16 +87,17 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="mobile-nav"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-hairline bg-background lg:hidden"
-          >
+      {/* Height animated by the grid-rows trick rather than a library: a
+          0fr → 1fr track transitions where `height: auto` cannot, and the
+          panel is inert while closed so nothing inside it takes focus. */}
+      <div
+        id="mobile-nav"
+        inert={!open}
+        className={`grid overflow-hidden border-t border-hairline bg-background transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:hidden ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] border-t-0 opacity-0"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
             <nav aria-label="Primary" className="shell py-3">
               <ul className="flex flex-col">
                 {site.nav.map((item) => (
@@ -122,9 +122,9 @@ export function SiteHeader() {
                 {WHATSAPP_DISPLAY}
               </a>
             </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      </div>
+
     </header>
   );
 }

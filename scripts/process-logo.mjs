@@ -4,57 +4,30 @@
  *
  *   npm run logo
  *
- * Source:  public/logo.png  — 446x337 RGBA, already background-removed.
- *          It is used AS-IS. No background removal, no upscaling.
+ * Source:  brand/logo-source.png — 446x337 RGBA, already background-removed.
+ *          Kept out of public/ so the full-size original is never served:
+ *          every mark on the page is one of the sized copies below.
  *
  * Writes:
  *   public/favicon-32.png    transparent, for browser tabs
  *   public/favicon-180.png   transparent, apple-touch-icon
- *   public/favicon-512.png   composited on a WHITE SQUARE — the source is too
+ *   public/favicon-512.webp  composited on a WHITE SQUARE — the source is too
  *                            wide and too small to crop into a crisp square
- *   public/logo-header.png   the mark with the strapline band cropped off,
- *                            which is illegible at header size
- *   public/og.png            1200x630 white canvas, logo centred
- *   public/assets/testimonials/placeholder-1..6.svg
- *                            initials-on-colour avatars (written directly,
- *                            no browser needed)
+ *   public/logo.webp         the whole mark at twice its largest slot, for
+ *                            the footer
+ *   public/logo-header.webp  the mark with the strapline band cropped off —
+ *                            illegible at header size — also at 2x its slot
+ *   public/og.jpg            1200x630 white canvas, logo centred
  */
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { setTimeout as sleep } from "node:timers/promises";
 
-const SOURCE = "public/logo.png";
+const SOURCE = "brand/logo-source.png";
 const PORT = 9335;
 const CHROME =
   process.env.CHROME_PATH ??
   "C:/Program Files/Google/Chrome/Application/chrome.exe";
-
-/* ---------------------------------------------------------- avatars ------ */
-/* Plain SVG files — no browser, no external requests. */
-
-/* Deliberately quiet greys: a placeholder should hold the shape of a photo
-   without competing with the brand's red. */
-const AVATAR_TONES = [
-  ["#e9e7e3", "#b4aea6"],
-  ["#e6e8e9", "#adb3b6"],
-  ["#eae8e4", "#b7b0a7"],
-  ["#e7e9e7", "#aeb5af"],
-  ["#ebe8e6", "#b9b1ab"],
-  ["#e6e7ea", "#aeb2b9"],
-];
-
-mkdirSync("public/assets/testimonials", { recursive: true });
-
-AVATAR_TONES.forEach(([bg, fg], i) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 600" width="480" height="600" role="img" aria-label="Student photo placeholder">
-  <rect width="480" height="600" fill="${bg}"/>
-  <circle cx="240" cy="236" r="76" fill="${fg}"/>
-  <path d="M96 520c0-84 64-140 144-140s144 56 144 140v80H96Z" fill="${fg}"/>
-</svg>
-`;
-  writeFileSync(`public/assets/testimonials/placeholder-${i + 1}.svg`, svg);
-  console.log(`  wrote public/assets/testimonials/placeholder-${i + 1}.svg`);
-});
 
 /* ------------------------------------------------------------- logo ------ */
 
@@ -165,7 +138,9 @@ const script = `(async () => {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, 512, 512);
     draw(ctx, 512, 512, 44);
-    out["favicon-512.png"] = c.toDataURL("image/png").split(",")[1];
+    // WebP: only Android and desktop PWAs ask for this one, and both read
+    // it. As PNG-24 the same square is four times the size.
+    out["favicon-512.webp"] = c.toDataURL("image/webp", 0.9).split(",")[1];
   }
 
   // Header variant: the strapline band at the foot of the logo is illegible
@@ -173,13 +148,29 @@ const script = `(async () => {
   // strapline included, still goes in the footer.
   {
     const keep = Math.round(th * 0.845);
-    const scale = 2;
+    // Twice the widest slot it is drawn into (180 CSS px), not twice the
+    // source: a 876px-wide PNG for a 180px mark is most of a slow first load.
+    const W = 400;
     const c = document.createElement("canvas");
-    c.width = Math.round(tw * scale); c.height = Math.round(keep * scale);
+    c.width = W; c.height = Math.round((W / tw) * keep);
     const ctx = c.getContext("2d");
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(probe, minX, minY, tw, keep, 0, 0, c.width, c.height);
-    out["logo-header.png"] = c.toDataURL("image/png").split(",")[1];
+    // WebP, not PNG: the mark is a shaded illustration with an alpha edge,
+    // which PNG-24 stores at around 100KB and WebP at a tenth of that with
+    // the transparency intact.
+    out["logo-header.webp"] = c.toDataURL("image/webp", 0.82).split(",")[1];
+  }
+
+  // The whole mark, strapline included, for the footer — same reasoning.
+  {
+    const W = 400;
+    const c = document.createElement("canvas");
+    c.width = W; c.height = Math.round((W / tw) * th);
+    const ctx = c.getContext("2d");
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(probe, minX, minY, tw, th, 0, 0, c.width, c.height);
+    out["logo.webp"] = c.toDataURL("image/webp", 0.82).split(",")[1];
   }
 
   // Social card: 1200x630 white, logo centred.
@@ -193,7 +184,9 @@ const script = `(async () => {
     const dw = tw * scale, dh = th * scale;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(probe, minX, minY, tw, th, (1200 - dw) / 2, (630 - dh) / 2, dw, dh);
-    out["og.png"] = c.toDataURL("image/png").split(",")[1];
+    // JPEG: a 1200x630 white card with one mark on it costs 200KB as PNG
+    // and 30KB here, and no one zooms into a social preview.
+    out["og.jpg"] = c.toDataURL("image/jpeg", 0.88).split(",")[1];
   }
 
   return { out, native: [W, H], trimmed: [tw, th] };

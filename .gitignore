@@ -41,9 +41,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# generated site assets are committed on purpose (see scripts/process-logo.mjs)
-# but the supplied source artwork is not
-/assets/logo-source.*
+# The sized marks in public/ are generated (see scripts/process-logo.mjs) and
+# committed; brand/logo-source.png is the master they are cut from and is
+# committed too, so the generator can be re-run from a fresh clone.
 
 # local screenshots
 /docs/screenshots/*.png
