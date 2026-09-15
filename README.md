@@ -18,8 +18,8 @@ the school and the visitor presses send.
 | Prices | `data/pricing.ts` |
 | WhatsApp number | `src/lib/whatsapp.ts` |
 | Testimonials | `data/testimonials.json` |
-| FAQs, hours, address, copy | `src/lib/site.ts` |
-| Logo | replace `public/logo.png`, then `npm run logo` |
+| FAQs, hours, copy | `src/lib/site.ts` |
+| Logo | replace `brand/logo-source.png`, then `npm run logo` |
 
 Everything else is layout.
 
@@ -27,22 +27,22 @@ Everything else is layout.
 
 ## Run it locally
 
-### With Docker (closest to production)
-
-```bash
-docker compose up --build
-```
-
-Then open <http://localhost:8080>. Stop with `Ctrl+C`, or `docker compose down`.
-
-### With Node (live reload while editing)
-
 ```bash
 npm install
 npm run dev
 ```
 
 Then open <http://localhost:3000>.
+
+To see exactly what gets published:
+
+```bash
+npm run build
+npx serve out
+```
+
+The build writes a folder of plain files — no server runs in production, so
+there is nothing to containerise.
 
 ---
 
