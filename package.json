@@ -14,7 +14,8 @@
     "logo": "node scripts/process-logo.mjs",
     "contrast": "node scripts/audit-hero-contrast.mjs",
     "verify": "node scripts/verify.mjs",
-    "gaps": "node scripts/audit-gaps.mjs"
+    "gaps": "node scripts/audit-gaps.mjs",
+    "links": "node scripts/audit-links.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
