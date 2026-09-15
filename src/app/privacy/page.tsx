@@ -19,9 +19,7 @@ export default function Privacy() {
 
       <h2>Who we are</h2>
       <p>
-        {site.legalName}, {site.contact.address.line1},{" "}
-        {site.contact.address.line2}, {site.contact.address.city}{" "}
-        {site.contact.address.postcode}. You can reach us on{" "}
+        {site.legalName}. You can reach us on{" "}
         <a href={site.contact.phoneHref}>{site.contact.phoneDisplay}</a> or at{" "}
         {site.contact.email ? (
           <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>

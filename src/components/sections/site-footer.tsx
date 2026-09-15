@@ -5,8 +5,6 @@ import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/whatsapp";
 const year = new Date().getFullYear();
 
 export function SiteFooter() {
-  const { address } = site.contact;
-
   return (
     <footer className="border-t border-hairline bg-white">
       <div className="shell grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:py-20">
@@ -46,14 +44,6 @@ export function SiteFooter() {
               </li>
             )}
           </ul>
-
-          <address className="mt-5 text-[0.93rem] leading-[1.6] text-muted-foreground not-italic">
-            {address.line1}
-            <br />
-            {address.line2}
-            <br />
-            {address.city} {address.postcode}
-          </address>
         </div>
 
         <div>

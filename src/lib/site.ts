@@ -34,14 +34,6 @@ export const site = {
      * nothing publishes a mailto: link to an address that does not exist.
      */
     email: "qdugesh@gmail.com" as string | null,
-    address: {
-      // TODO: replace with the real address, or delete the block and the
-      // footer <address> that renders it.
-      line1: "Address line 1",
-      line2: "Address line 2",
-      city: "Town",
-      postcode: "POSTCODE",
-    },
   },
 
   hours: [{ days: "Monday – Sunday", time: "06:00 – 16:00" }],

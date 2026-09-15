@@ -25,11 +25,12 @@ export function Hero() {
       >
         {/* Phones: a dense residential crop, chosen because it reads as even
             texture at portrait width — no park or water mass sits behind the
-            headline. */}
+            headline. The window is tight on purpose: cropped wider, the
+            streets shrink to a grey hatch and stop reading as a town. */}
         <MapArt
           route={false}
-          className="absolute inset-0 h-full w-full opacity-60 md:hidden"
-          viewBox="150 240 620 1120"
+          className="absolute inset-0 h-full w-full opacity-90 md:hidden"
+          viewBox="380 250 380 620"
           preserveAspectRatio="xMidYMid slice"
         />
         {/* Tablets up: the desktop framing — full-bleed behind the copy until
@@ -38,7 +39,7 @@ export function Hero() {
 
         {/* Scrims. Phones and tablets get a flat wash plus a fade behind the
             copy; wide screens keep the horizontal fade. */}
-        <div className="absolute inset-0 bg-white/40 lg:hidden" />
+        <div className="absolute inset-0 bg-white/25 lg:hidden" />
         <div className="absolute inset-x-0 top-0 h-[70%] bg-[linear-gradient(to_bottom,#ffffff_0%,#ffffff_74%,rgba(255,255,255,0.55)_92%,rgba(255,255,255,0)_100%)] lg:hidden" />
         <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_14%,rgba(255,255,255,0.9)_32%,rgba(255,255,255,0.35)_54%,rgba(255,255,255,0)_74%)] lg:block" />
         <div className="absolute inset-x-0 top-0 hidden h-24 bg-[linear-gradient(to_bottom,#ffffff,rgba(255,255,255,0))] lg:block" />

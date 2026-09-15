@@ -20,13 +20,9 @@ function schema() {
     url: site.url,
     telephone: contact.phoneDisplay,
     email: contact.email,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: `${contact.address.line1}, ${contact.address.line2}`,
-      addressLocality: contact.address.city,
-      postalCode: contact.address.postcode,
-      addressCountry: "GB",
-    },
+    // No street address is published, so the only place claim we can make
+    // truthfully is the area covered.
+    areaServed: "Manchester, United Kingdom",
     openingHours: hours.map((row) => `${row.days} ${row.time}`),
   };
 }

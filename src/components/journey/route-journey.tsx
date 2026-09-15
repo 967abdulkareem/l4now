@@ -222,7 +222,10 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           // side, with a small bend beside each card. Never over the content.
           const lane = get("[data-lane='left']");
           const laneR = get("[data-lane='right']");
-          const laneX = lane ? lane.cx : 24;
+          // Not the middle of the gutter: a run down the outer third of it
+          // stands clear of the card by about half a card corner, which is
+          // what stops the wave reading as a box drawn around the card.
+          const laneX = lane ? lane.left + lane.w * 0.28 : 24;
           const grid = get("[data-course-grid]");
 
           // Below `lg` the map carries no route and no pins — at portrait
@@ -278,7 +281,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
         }
 
         const clean = tidy(pts);
-        const d = roundedPath(clean, wide ? CORNER : 12);
+        const d = roundedPath(clean, wide ? CORNER : 20);
 
         svg!.setAttribute("viewBox", `0 0 ${W} ${H}`);
         base!.setAttribute("d", d);
