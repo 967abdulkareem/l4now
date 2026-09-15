@@ -30,11 +30,10 @@ export const site = {
     phoneDisplay: WHATSAPP_DISPLAY,
     phoneHref: `tel:+${WHATSAPP_NUMBER}`,
     /**
-     * TODO_EMAIL — set this to the real address and the email row appears
-     * everywhere on its own. Left null so nothing publishes a mailto: link
-     * to an address that does not exist.
+     * Set this and the email row appears everywhere on its own; left null,
+     * nothing publishes a mailto: link to an address that does not exist.
      */
-    email: null as string | null,
+    email: "qdugesh@gmail.com" as string | null,
     address: {
       // TODO: replace with the real address, or delete the block and the
       // footer <address> that renders it.

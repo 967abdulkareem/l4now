@@ -18,20 +18,22 @@ type Testimonial = {
 const items = testimonials as Testimonial[];
 const count = items.length;
 
-/** Swipe distance, in px, before it counts as a deliberate gesture. */
-const SWIPE = 45;
+/** Movement, in px, before a press counts as a drag rather than a tap. */
+const DRAG = 8;
 
-/** One turn of the deck. Long and eased, so it settles rather than snaps. */
-const TURN = 1.15;
+/** A flick past this speed (cards per second) carries on to the next card. */
+const FLICK = 1.1;
+
+/** One settle of the rail. Long and eased, so it glides rather than snaps. */
+const SETTLE = 0.85;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * Reviews are long — up to 800 characters — so each one is read as a headline
- * and the rest. The first sentence is nearly always the verdict ("I passed
- * first time", "one of the best instructors out there"), which is exactly
- * what belongs in display type; the detail underneath is for whoever is
- * still reading.
+ * Reviews are long — up to 800 characters — so each is read as a verdict and
+ * the detail. The first sentence is nearly always the verdict ("I passed
+ * first time", "one of the best instructors out there"), which is what
+ * belongs in display type; the rest follows underneath.
  */
 function splitQuote(quote: string) {
   const at = /[.!?]\s/.exec(quote.slice(28));
@@ -40,35 +42,40 @@ function splitQuote(quote: string) {
   return { lead: quote.slice(0, cut).trim(), rest: quote.slice(cut).trim() };
 }
 
-/** Signed distance from the current slide, wrapped the short way round. */
-function offsetFrom(i: number, index: number) {
-  const raw = i - index;
-  if (raw > count / 2) return raw - count;
-  if (raw < -count / 2) return raw + count;
-  return raw;
+/** Signed distance between two positions on the rail, the short way round. */
+function shortest(delta: number) {
+  const wrapped = ((delta % count) + count) % count;
+  return wrapped > count / 2 ? wrapped - count : wrapped;
 }
 
 /**
- * The reviews, as a deck: the current one square on, its neighbours turned
- * away to either side.
+ * The reviews, on a rail: the current one square on, the rest hanging either
+ * side like coats pushed along a rod.
  *
- * Why a deck rather than one card at a time: twenty-one people have written
- * in, and a single card hides that. Seeing the stack continue past both edges
- * says there is more here than the one you are reading, which is the whole
- * point of the section.
+ * The whole arrangement is a function of one number — `rail.v`, a fractional
+ * position along the reviews. Buttons and keys tween that number; a drag sets
+ * it straight from the pointer and then tweens it to the nearest whole one.
+ * Because every card's x, scale, turn and opacity are derived from it
+ * continuously, a half-finished drag looks exactly like a half-finished
+ * tween, and no case has to be special-cased.
  *
- * Nothing moves on its own: the deck turns when the reader turns it, with
- * the arrows, the dots, a swipe or the arrow keys. That also means there is
- * no autoplay to pause, which is the simplest way to satisfy WCAG 2.2.2.
+ * Nothing moves on its own, so there is no autoplay to pause — the simplest
+ * way to satisfy WCAG 2.2.2.
  */
 export function Testimonials() {
   const [index, setIndex] = useState(0);
+  /** Which review is opened out, if any — not a flag to reset on every move. */
+  const [openAt, setOpenAt] = useState<number | null>(null);
   const [reduced, setReduced] = useState(false);
 
   const scope = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLUListElement>(null);
   const countRef = useRef<HTMLSpanElement>(null);
-  const touchX = useRef<number | null>(null);
+
+  /** Fractional position along the rail. The single source of the layout. */
+  const rail = useRef({ v: 0 });
+  const place = useRef<(p: number) => void>(() => {});
+  const settle = useRef<(to: number) => void>(() => {});
 
   const go = useCallback(
     (next: number) => setIndex(((next % count) + count) % count),
@@ -83,59 +90,74 @@ export function Testimonials() {
     return () => mq.removeEventListener("change", sync);
   }, []);
 
-  /**
-   * The deck itself. Every card is placed by the same function, so the
-   * arrangement is one rule rather than a set of special cases, and a card
-   * that has just moved from the far edge to the near one animates the same
-   * way as any other.
-   */
   useGSAP(
     () => {
       const cards = gsap.utils.toArray<HTMLElement>("[data-review-card]");
       if (!cards.length) return;
 
-      const mm = gsap.matchMedia();
+      /**
+       * Where a card sits, given how far it is from the middle. Continuous in
+       * `off`, so it describes a drag in progress as happily as a finished
+       * one: the first card out either side moves a whole step, the ones past
+       * it are compressed into what is left.
+       */
+      const position = (off: number) => {
+        const away = Math.abs(off);
+        const dir = Math.sign(off);
+        const wide = window.innerWidth >= 768;
+        const near = wide ? 84 : 64;
+        const far = wide ? 158 : 112;
+        const spread =
+          away <= 1
+            ? away * near
+            : near + (Math.min(away, 2) - 1) * (far - near);
 
-      const place = (near: number, far: number, visible: number) => () => {
+        return {
+          xPercent: -50 + dir * spread,
+          scale:
+            1 - 0.12 * Math.min(away, 1) - 0.1 * gsap.utils.clamp(0, 1, away - 1),
+          rotationY: -dir * 8 * Math.min(away, 2),
+          autoAlpha:
+            away >= 2.6
+              ? 0
+              : 1 -
+                0.38 * Math.min(away, 1) -
+                0.3 * gsap.utils.clamp(0, 1.6, away - 1),
+          zIndex: 20 - Math.round(away * 2),
+        };
+      };
+
+      place.current = (p: number) => {
+        rail.current.v = p;
         cards.forEach((card, i) => {
-          const off = offsetFrom(i, index);
-          const away = Math.abs(off);
-          const shown = away <= visible;
-          // Absolute offsets, not a multiple: the second card sits just
-          // beyond the first, and multiplying would throw it off screen.
-          const step = away === 0 ? 0 : away === 1 ? near : far;
-
-          const to = {
-            xPercent: -50 + Math.sign(off) * step,
-            y: away * 16,
-            scale: away === 0 ? 1 : away === 1 ? 0.88 : 0.78,
-            rotationY: off === 0 ? 0 : Math.sign(off) * -16,
-            autoAlpha: shown ? (away === 0 ? 1 : away === 1 ? 0.62 : 0.28) : 0,
-            zIndex: 10 - away,
-            duration: TURN,
-            // power2 rather than power3: the same distance covered with less
-            // of it crammed into the first few frames, which is what makes a
-            // turn feel slow and deliberate rather than merely long.
-            ease: "power2.out",
-            // The outer cards settle a beat after the middle one, so the deck
-            // arrives as a group instead of snapping into place at once.
-            delay: away * 0.05,
-            overwrite: "auto" as const,
-          };
-
-          card.style.pointerEvents = away === 0 || !shown ? "none" : "auto";
-          if (reduced) {
-            gsap.set(card, { ...to, duration: 0 });
-          } else {
-            gsap.to(card, to);
-          }
+          const off = shortest(i - p);
+          gsap.set(card, position(off));
+          // Cards you can see are cards you can grab or jump to; the rest are
+          // out of the way of the pointer as well as the eye.
+          card.style.pointerEvents = Math.abs(off) < 2.6 ? "auto" : "none";
         });
       };
 
-      // Phones show one card with the next two just breaking the edge;
-      // wide screens have room for the full spread.
-      mm.add("(max-width: 767px)", place(64, 112, 2));
-      mm.add("(min-width: 768px)", place(84, 158, 2));
+      settle.current = (to: number) => {
+        gsap.killTweensOf(rail.current);
+        if (reduced) {
+          place.current(to);
+          go(Math.round(to));
+          return;
+        }
+        gsap.to(rail.current, {
+          v: to,
+          duration: SETTLE,
+          // inOut on both halves: the rail leaves and arrives at the same
+          // unhurried speed, which is what makes a slide read as a slide
+          // rather than a snap with a long tail.
+          ease: "power2.inOut",
+          onUpdate: () => place.current(rail.current.v),
+          onComplete: () => go(Math.round(to)),
+        });
+      };
+
+      place.current(rail.current.v);
 
       if (!reduced && countRef.current) {
         gsap.from(countRef.current, {
@@ -146,10 +168,82 @@ export function Testimonials() {
         });
       }
 
-      return () => mm.revert();
+      const onResize = () => place.current(rail.current.v);
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
     },
-    { dependencies: [index, reduced], scope, revertOnUpdate: true },
+    { dependencies: [reduced], scope, revertOnUpdate: true },
   );
+
+  // Buttons, dots and keys move the index; the rail follows the short way
+  // round rather than unwinding through every card in between.
+  useGSAP(
+    () => {
+      const target = rail.current.v + shortest(index - rail.current.v);
+      if (Math.abs(target - rail.current.v) < 0.001) return;
+      settle.current(target);
+    },
+    { dependencies: [index], scope },
+  );
+
+  /**
+   * Drag. The rail follows the pointer one for one, so a half-swipe sits
+   * half-way; let go and it finishes the movement you started.
+   */
+  const drag = useRef<{
+    id: number;
+    x: number;
+    from: number;
+    at: number;
+    moved: boolean;
+  } | null>(null);
+
+  const cardWidth = () =>
+    stage.current?.querySelector("[data-review-card]")?.clientWidth || 320;
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    gsap.killTweensOf(rail.current);
+    drag.current = {
+      id: e.pointerId,
+      x: e.clientX,
+      from: rail.current.v,
+      at: performance.now(),
+      moved: false,
+    };
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x;
+    if (!d.moved && Math.abs(dx) < DRAG) return;
+    if (!d.moved) {
+      d.moved = true;
+      e.currentTarget.setPointerCapture(d.id);
+    }
+    place.current(d.from - dx / cardWidth());
+  };
+
+  const endDrag = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    drag.current = null;
+    if (!d.moved) return;
+
+    const dx = e.clientX - d.x;
+    const travelled = dx / cardWidth();
+    const speed = (travelled / Math.max(16, performance.now() - d.at)) * 1000;
+
+    // A flick is an instruction even when it barely moved; a slow drag ends
+    // up wherever it was let go.
+    const target =
+      Math.abs(speed) > FLICK
+        ? Math.round(d.from) - Math.sign(dx)
+        : Math.round(rail.current.v);
+
+    settle.current(target);
+  };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "ArrowLeft") {
@@ -173,26 +267,23 @@ export function Testimonials() {
     >
       <div className="shell" ref={scope}>
         <div className="max-w-[40rem]">
-          <div>
-            <p data-anim-line className="eyebrow">
-              Student reviews
-            </p>
-            <h2
-              data-anim-heading
-              className="display mt-3 text-[clamp(2rem,4.6vw,3.1rem)]"
-            >
-              What our students say<span className="text-brand">.</span>
-            </h2>
-            <p
-              data-anim-line
-              className="mt-4 max-w-[32rem] text-[1.02rem] leading-[1.6] text-ink-soft"
-            >
-              Real words from people who learned here. Passed with{" "}
-              {site.shortName}? Send us a line on WhatsApp and we will add
-              yours.
-            </p>
-          </div>
-
+          <p data-anim-line className="eyebrow">
+            Student reviews
+          </p>
+          <h2
+            data-anim-heading
+            className="display mt-3 text-[clamp(2rem,4.6vw,3.1rem)]"
+          >
+            What our students say<span className="text-brand">.</span>
+          </h2>
+          <p
+            data-anim-line
+            className="mt-4 max-w-[32rem] text-[1.02rem] leading-[1.6] text-ink-soft"
+          >
+            Real words from people who learned here. Passed with{" "}
+            {site.shortName}? Send us a line on WhatsApp and we will add
+            yours.
+          </p>
         </div>
 
         {/* Add more reviews in /data/testimonials.json. */}
@@ -203,33 +294,33 @@ export function Testimonials() {
           aria-label="Student reviews"
           tabIndex={-1}
           onKeyDown={onKeyDown}
-          onTouchStart={(e) => {
-            touchX.current = e.touches[0].clientX;
-          }}
-          onTouchEnd={(e) => {
-            if (touchX.current === null) return;
-            const dx = e.changedTouches[0].clientX - touchX.current;
-            if (Math.abs(dx) > SWIPE) go(index + (dx < 0 ? 1 : -1));
-            touchX.current = null;
-          }}
           className="mt-12 lg:mt-14"
         >
-          {/* Fixed height: the deck must not resize the page as it turns. */}
+          {/* Fixed height: the rail must not resize the page as it moves.
+              `touch-pan-y` keeps the page scrollable through the cards while
+              horizontal drags belong to the rail. */}
           <ul
             ref={stage}
             data-quote
-            className="relative h-[27rem] [perspective:1400px] sm:h-[26rem] lg:h-[28rem]"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            className="relative h-[27rem] touch-pan-y select-none [perspective:1400px] sm:h-[26rem] lg:h-[28rem]"
           >
             {items.map((item, i) => {
               const { lead, rest } = splitQuote(item.quote);
               const isCurrent = i === index;
+              const open = openAt === i && isCurrent;
 
               return (
                 <li
                   key={`${item.name}-${i}`}
                   data-review-card
                   aria-hidden={!isCurrent}
-                  onClick={isCurrent ? undefined : () => go(i)}
+                  onClick={() => {
+                    if (!isCurrent) go(i);
+                  }}
                   className={`card-surface absolute top-0 left-1/2 flex h-full w-[min(21rem,78vw)] flex-col overflow-hidden p-6 will-change-transform sm:w-[22rem] lg:p-8 ${
                     isCurrent
                       ? "shadow-[0_28px_60px_-40px_rgb(17_17_17/0.55)]"
@@ -242,18 +333,39 @@ export function Testimonials() {
                     <span className="text-brand">&rdquo;</span>
                   </blockquote>
 
-                  {/* The clamp has to own the box it is clamping: `flex-1`
-                      on the paragraph itself stretches the -webkit-box past
-                      its own line limit and the text is cut mid-line. */}
-                  <div className="mt-4 min-h-0 flex-1 overflow-hidden">
+                  {/* The clamp has to own the box it is clamping: `flex-1` on
+                      the paragraph itself stretches the -webkit-box past its
+                      own line limit and the text is cut mid-line. Opened, the
+                      same box scrolls rather than growing, so a long review
+                      can be read in full without the rail changing height. */}
+                  <div
+                    className={`mt-4 min-h-0 flex-1 ${
+                      open ? "overflow-y-auto pr-1" : "overflow-hidden"
+                    }`}
+                    tabIndex={open ? 0 : -1}
+                  >
                     {rest && (
-                      <p className="line-clamp-5 text-[0.95rem] leading-[1.6] text-ink-soft lg:line-clamp-6">
+                      <p
+                        className={`text-[0.95rem] leading-[1.6] text-ink-soft ${
+                          open ? "" : "line-clamp-5 lg:line-clamp-6"
+                        }`}
+                      >
                         {rest}
                       </p>
                     )}
                   </div>
 
-                  <footer className="mt-6 border-t border-hairline pt-4">
+                  <footer className="mt-4 border-t border-hairline pt-4">
+                    {isCurrent && rest.length > 150 && (
+                      <button
+                        type="button"
+                        onClick={() => setOpenAt(open ? null : i)}
+                        aria-expanded={open}
+                        className="mb-3 text-[0.85rem] font-semibold text-brand underline underline-offset-4 hover:text-ink"
+                      >
+                        {open ? "Show less" : "Read the full review"}
+                      </button>
+                    )}
                     <p className="text-[1rem] font-bold text-ink">
                       &mdash; {item.name}
                     </p>
@@ -300,7 +412,7 @@ export function Testimonials() {
               <ChevronRight className="size-4" aria-hidden="true" />
             </button>
 
-            <ul className="ml-2 hidden items-center gap-1.5 sm:flex">
+            <ul data-dots className="ml-2 hidden items-center gap-1.5 sm:flex">
               {items.map((item, i) => (
                 <li key={`dot-${item.name}-${i}`}>
                   <button
@@ -320,7 +432,7 @@ export function Testimonials() {
           </div>
 
           <p className="mt-5 text-center text-[0.78rem] font-medium tracking-[0.14em] text-muted-foreground uppercase">
-            Swipe, or pick a card either side
+            Drag the cards, or use the arrows
           </p>
         </div>
       </div>

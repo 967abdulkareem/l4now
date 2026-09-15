@@ -165,25 +165,36 @@ await sleep(1600);
 const beforeSwipe = await js("__live()");
 await js(
   [
-    "const c = __c();",
-    "const mk = (x) => new Touch({ identifier: 1, target: c, clientX: x, clientY: 10 });",
-    'const fire = (type, x) => c.dispatchEvent(new TouchEvent(type, { bubbles: true, touches: type === "touchend" ? [] : [mk(x)], changedTouches: [mk(x)] }));',
-    'fire("touchstart", 300); fire("touchend", 150); 1',
+    // The rail is driven by pointer events, so the drag has to be one too:
+    // press, move past the threshold in a few steps, release.
+    '  const rail = document.querySelector("[data-quote]");',
+    "  const r = rail.getBoundingClientRect();",
+    "  const y = Math.round(r.top + r.height / 2);",
+    "  const fire = (type, x) => rail.dispatchEvent(new PointerEvent(type, {",
+    "    bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true,",
+    "    button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: y }));",
+    "  rail.setPointerCapture = () => {};",
+    "  rail.releasePointerCapture = () => {};",
+    "  const from = Math.round(r.left + r.width / 2);",
+    "  fire('pointerdown', from);",
+    "  for (let i = 1; i <= 6; i++) fire('pointermove', from - i * 40);",
+    "  fire('pointerup', from - 240);",
+    "  1",
   ].join("\n"),
 );
 await sleep(1600);
-check("swipe advances", beforeSwipe !== (await js("__live()")), beforeSwipe);
+check("drag advances", beforeSwipe !== (await js("__live()")), beforeSwipe);
 
-const dotCount = await js('__c().querySelectorAll("li button").length');
+const dotCount = await js('__c().querySelectorAll("[data-dots] button").length');
 const last = dotCount - 1;
-await js(`__c().querySelectorAll("li button")[${last}].click()`);
+await js(`__c().querySelectorAll("[data-dots] button")[${last}].click()`);
 await sleep(1600);
 const dotLive = await js("__live()");
 check("dots jump to slide", new RegExp(`Review ${last + 1} of`).test(dotLive), dotLive);
 
 const heights = [];
 for (let i = 0; i < dotCount; i += 1) {
-  await js(`__c().querySelectorAll("li button")[${i}].click()`);
+  await js(`__c().querySelectorAll("[data-dots] button")[${i}].click()`);
   await sleep(1500);
   heights.push(await js("__cardH()"));
 }
