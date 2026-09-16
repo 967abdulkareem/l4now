@@ -38,7 +38,7 @@ export function Pricing() {
               const ask = item.price === TODO_PRICE;
               const featured = Boolean(item.badge);
               const href = whatsappLink(
-                `Hello ${site.name} — I would like to ask about ${item.name}.`,
+                `Hello ${site.instructor} at ${site.shortName} — I would like to ask about ${item.name}.`,
               );
 
               return (

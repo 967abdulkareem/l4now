@@ -87,6 +87,9 @@ export function Reservation() {
                     <dd className="mt-0.5 text-[0.93rem] text-ink-soft">
                       {site.coverage}
                     </dd>
+                    <dd className="mt-1.5 text-[0.93rem] text-ink-soft">
+                      Test centres: {site.testCentres.join(", ")}.
+                    </dd>
                   </div>
                 </div>
               </dl>

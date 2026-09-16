@@ -13,6 +13,8 @@ import { WHATSAPP_DISPLAY, WHATSAPP_NUMBER } from "./whatsapp";
 
 export const site = {
   name: "L_4NOW Driving School",
+  /** Who the WhatsApp messages are addressed to. */
+  instructor: "Kais",
   shortName: "L_4NOW",
   legalName: "L_4NOW Driving School",
   tagline: "Learn • Practice • Succeed",
@@ -40,16 +42,16 @@ export const site = {
    */
   trustSignals: [
     "DVSA-approved instructor (ADI)",
-    "Manual & automatic",
+    "Manual lessons",
     "Pick-up and drop-off included",
   ],
 
-  /**
-   * One line instead of a coverage table. No test centre is named: learners
-   * book the centre that suits them and we teach towards it.
-   */
+  /** One line instead of a coverage table. */
   coverage:
-    "Lessons across Manchester and the surrounding areas, with pick-up and drop-off included. You choose your test centre and we prepare you for it.",
+    "Manchester based, with pick-up and drop-off inside Manchester included.",
+
+  /** The centres we teach towards, and know the routes around. */
+  testCentres: ["West Didsbury", "Cheetham Hill", "Sale", "Bredbury"],
 
   /** The three stages the route travels through. */
   steps: [
@@ -79,16 +81,16 @@ export const site = {
       a: "It depends on how often you drive and how much private practice you get. We will give you an honest estimate after your first couple of lessons, and keep it updated as you go.",
     },
     {
-      q: "Manual or automatic — which should I choose?",
-      a: "Automatic is usually quicker to learn and fine if you never intend to drive a manual. A manual licence covers both. Either way the hourly rate is the same, so choose the one you want to drive — and if you are unsure, say so when you enquire and we will talk it through.",
+      q: "Do you teach automatic?",
+      a: "No — lessons are manual only, in a dual-controlled manual car. A manual licence lets you drive both, so it is the licence worth having if you are choosing.",
     },
     {
       q: "Do you pick me up from home?",
-      a: "Yes, anywhere across Manchester and the surrounding areas, at no extra cost. Home, work, college or the station — whatever is easiest that day.",
+      a: "Yes, anywhere inside Manchester, at no extra cost. Home, work, school, college or the station — whatever is easiest that day.",
     },
     {
       q: "Which test centre will I use?",
-      a: "Whichever one you want. You book the test, and we spend the lessons before it on the roads, junctions and manoeuvres that centre is known for.",
+      a: "We cover West Didsbury, Cheetham Hill, Sale and Bredbury. You book the test at whichever suits you, and we spend the lessons before it on the roads, junctions and manoeuvres that centre is known for.",
     },
     {
       q: "What happens in the first lesson?",
@@ -96,11 +98,7 @@ export const site = {
     },
     {
       q: "How much do lessons cost?",
-      a: "Lessons start at £35 an hour and are booked as 1½ hour or 2 hour sessions; motorway lessons start at £40 an hour. We confirm the price for the session you want when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
-    },
-    {
-      q: "Can I use your car for the driving test?",
-      a: "Ask when you enquire. We will confirm availability for your test date and what it involves.",
+      a: "A first lesson starts at £32 an hour, lessons after that at £35, and school and college students at £32. Motorway lessons start at £45. Everything is booked as a 1½ hour or 2 hour session, and we confirm the price when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
     },
     {
       q: "I am nervous. Is that a problem?",
@@ -128,7 +126,14 @@ export const site = {
 
   /** Options offered by the enquiry form. */
   booking: {
-    lessonTypes: ["Beginner", "Refresher", "Test prep", "Motorway"],
+    lessonTypes: [
+      "First lesson",
+      "Beginner",
+      "School or college student",
+      "Refresher",
+      "Test prep",
+      "Motorway",
+    ],
     /** Every lesson is booked as one of these. Prices match data/pricing.ts. */
     lessonLengths: ["1½ hours", "2 hours"],
     timeSlots: [

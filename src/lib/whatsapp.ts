@@ -2,12 +2,12 @@
  * WHATSAPP NUMBER — change it here and nowhere else.
  *
  * Digits only: country code first, no "+", no spaces, no brackets.
- * UK example: +44 7400 617589  →  "447400617589"
+ * UK example: +44 7404 697331  →  "447404697331"
  * ────────────────────────────────────────────────────────────────────────── */
-export const WHATSAPP_NUMBER = "447400617589";
+export const WHATSAPP_NUMBER = "447404697331";
 
 /** Pretty version, for anything shown on screen. */
-export const WHATSAPP_DISPLAY = "+44 7400 617589";
+export const WHATSAPP_DISPLAY = "+44 7404 697331";
 
 /**
  * Builds a wa.me link with the message pre-filled.

@@ -47,9 +47,10 @@ export default function Accessibility() {
       <h2>In the car</h2>
       <p>
         Tell us what you need when you enquire. We can allow longer lessons for
-        processing time, provide written instructions in advance, adjust
-        seating, and teach in an automatic where that removes a barrier. We are
-        happy for a parent, carer or support worker to sit in.
+        processing time, provide written instructions in advance, and adjust
+        seating. Lessons are in a manual car; if an automatic is what you need,
+        say so and we will tell you honestly that this is not the school for
+        it. We are happy for a parent, carer or support worker to sit in.
       </p>
 
       <h2>Telling us about a problem</h2>

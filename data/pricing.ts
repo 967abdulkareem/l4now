@@ -13,9 +13,9 @@
  * broken figure. Replace the value with a string like "£450" when known.
  *
  * ── Transmission ───────────────────────────────────────────────────────────
- * Manual and automatic are taught at the same rate, so the hourly entries
- * carry `transmission: "both"` and say so on the card. If the rates ever
- * diverge, split them into separate entries with "manual" and "automatic".
+ * Manual only. The lesson entries say so on the card, so nobody books an
+ * automatic lesson that cannot be given. Add "automatic" entries here if that
+ * ever changes.
  */
 
 /** Sentinel for a price that has not been supplied yet. */
@@ -41,62 +41,64 @@ export type PriceItem = {
 
 export const pricing: PriceItem[] = [
   {
+    id: "first-lesson",
+    name: "First lesson",
+    subtitle: "Your introduction to the road",
+    price: "From £32",
+    unit: "per hour",
+    transmission: "manual",
+    note: "Somewhere quiet to start, the controls at a standstill, then moving away and stopping a few times. No experience needed and no pressure to book anything further.",
+    ctaLabel: "Book your first lesson",
+  },
+  {
     id: "driving-lessons",
     name: "Driving lessons",
-    subtitle: "Every lesson, every level",
+    subtitle: "Every lesson after the first",
     price: "From £35",
     unit: "per hour",
-    transmission: "both",
-    note: "Flexible times and lessons with a DVSA-approved instructor (ADI), in a dual-controlled car. Somewhere quiet to start, and no pressure to book anything further.",
+    transmission: "manual",
+    note: "Flexible times and lessons with a DVSA-approved instructor (ADI), in a dual-controlled car. Booked as a 1½ or 2 hour session, with pick-up and drop-off inside Manchester.",
     ctaLabel: "Book a lesson",
+  },
+  {
+    id: "school-students",
+    name: "School & college students",
+    subtitle: "Learning around your timetable",
+    price: "From £32",
+    unit: "per hour",
+    transmission: "manual",
+    note: "For students still at school, sixth form or college: lessons fitted around the timetable, and the same rate whether you book one or several.",
+    ctaLabel: "Ask about student lessons",
   },
   {
     id: "motorway",
     name: "Motorway lesson",
     subtitle: "Confidence at speed",
-    price: "From £40",
+    price: "From £45",
     unit: "per hour",
     note: "Joining, lane discipline, overtaking and leaving at speed, in a dual-controlled car. Booked as a 1½ or 2 hour session like any other lesson.",
     ctaLabel: "Ask about motorway lessons",
   },
   {
-    id: "standard-course",
-    name: "Standard course",
-    subtitle: "2–4 hours a week",
+    id: "refresher",
+    name: "Refresher lesson",
+    subtitle: "You already hold a licence",
     price: TODO_PRICE,
-    unit: "per course",
-    note: "A steady weekly rhythm, which is how most learners build habits that stick. Length is set with you once we know where you are starting from.",
-    ctaLabel: "Ask us about the course",
+    unit: "per lesson",
+    note: "For drivers who passed and then stopped, or who want one thing worked through — parking, roundabouts, a bigger car — without starting again from the beginning.",
+    ctaLabel: "Ask about a refresher",
   },
   {
     id: "intensive-course",
     name: "Intensive course",
-    subtitle: "6–8 hours a week",
+    subtitle: "A test date that is close",
     price: TODO_PRICE,
     unit: "per course",
-    note: "For a test date that is close, or time off work to use. Demanding, and not right for everyone — we will say so if it is not right for you.",
+    note: "Several lessons a week for a short stretch. Demanding, and not right for everyone — we will say so if it is not right for you.",
     ctaLabel: "Ask us about intensives",
-  },
-  {
-    id: "theory",
-    name: "Theory & hazard perception",
-    subtitle: "Preparation away from the wheel",
-    price: TODO_PRICE,
-    unit: "per session",
-    note: "Working through the theory question bank and hazard-perception clips together, so the test is not the first time you meet them.",
-    ctaLabel: "Ask us about theory",
-  },
-  {
-    id: "test-day-car",
-    name: "Test day car hire",
-    subtitle: "Use our car for your test",
-    price: "£100",
-    unit: "one-off",
-    note: "The car you learned in, on the day it matters, with a warm-up drive beforehand. Subject to availability on your test date.",
-    ctaLabel: "Ask about test day",
   },
 ];
 
 /** Small print shown under the grid. */
 export const pricingNote =
-  "Lessons are booked as 1½ hour or 2 hour sessions. Prices may vary by area and availability, and are confirmed when you book — pay by bank transfer or cash once the lesson is agreed, with no deposit.";
+  "Manual lessons, booked as 1½ hour or 2 hour sessions. Prices may vary by area and availability, and are confirmed when you book — pay by bank transfer or cash once the lesson is agreed, with no deposit.";

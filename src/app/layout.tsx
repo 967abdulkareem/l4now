@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     "driving instructor",
     "learn to drive",
     "manual driving lessons",
-    "automatic driving lessons",
+    "driving lessons Manchester",
     "driving school",
   ],
   applicationName: site.name,
