@@ -111,6 +111,9 @@ export function Pricing() {
                     {item.note}
                   </p>
 
+                  {/* Each package is the enquiry, so pressing one opens
+                      WhatsApp with that package named — a reader who has
+                      already chosen should not have to type it out. */}
                   {item.bullets && (
                     <div className="mt-5 flex-1">
                       <p className="text-[0.86rem] font-semibold text-ink">
@@ -118,11 +121,18 @@ export function Pricing() {
                       </p>
                       <ul className="mt-3 flex flex-wrap gap-2">
                         {item.bullets.map((option) => (
-                          <li
-                            key={option}
-                            className="rounded-full border border-ink/12 px-3.5 py-1.5 text-[0.9rem] text-ink-soft"
-                          >
-                            {option}
+                          <li key={option}>
+                            <a
+                              href={whatsappLink(
+                                `Hello ${site.instructor} at ${site.shortName} — I would like to ask about a ${item.name.toLowerCase()}: ${option}.`,
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Ask about a gift voucher for ${option}`}
+                              className="block rounded-full border border-ink/12 px-3.5 py-1.5 text-[0.9rem] text-ink-soft transition-colors hover:border-brand hover:bg-brand-tint hover:text-brand focus-visible:border-brand"
+                            >
+                              {option}
+                            </a>
                           </li>
                         ))}
                       </ul>

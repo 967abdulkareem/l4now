@@ -1,4 +1,4 @@
-import { Armchair, GraduationCap, ShieldCheck } from "lucide-react";
+import { Armchair, ShieldCheck, Users } from "lucide-react";
 
 import { Lanes } from "@/components/lanes";
 
@@ -12,8 +12,8 @@ import { Lanes } from "@/components/lanes";
  */
 const FACTS = [
   { icon: ShieldCheck, label: "Dual-control" },
-  { icon: Armchair, label: "Comfortable" },
-  { icon: GraduationCap, label: "Easy to learn" },
+  { icon: Armchair, label: "Comfortable & easy to learn" },
+  { icon: Users, label: "Friendly environment" },
 ] as const;
 
 export function TheCar() {
@@ -41,15 +41,15 @@ export function TheCar() {
               <img
                 src="/car.webp"
                 alt="The L_4NOW car: a dual-controlled manual hatchback with L plates and a roof sign."
-                width={798}
-                height={445}
+                width={1200}
+                height={690}
                 loading="lazy"
                 decoding="async"
                 className="mx-auto h-auto w-full max-w-[32rem] lg:max-w-none"
               />
             </div>
 
-            <ul className="order-3 grid grid-cols-3 gap-x-4 gap-y-2 lg:order-none lg:col-span-4 lg:row-start-2 lg:grid-cols-1 lg:gap-6 lg:self-start">
+            <ul className="order-3 grid grid-cols-3 gap-x-3 gap-y-2 lg:order-none lg:col-span-4 lg:row-start-2 lg:grid-cols-1 lg:gap-6 lg:self-start">
               {FACTS.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -60,7 +60,7 @@ export function TheCar() {
                     className="size-6 shrink-0 text-brand"
                     aria-hidden="true"
                   />
-                  <span className="text-[0.9rem] leading-[1.3] text-ink-soft lg:text-[0.98rem]">
+                  <span className="text-[0.84rem] leading-[1.3] text-balance text-ink-soft sm:text-[0.9rem] lg:text-[0.98rem]">
                     {label}
                   </span>
                 </li>
