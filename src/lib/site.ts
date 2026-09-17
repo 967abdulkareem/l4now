@@ -141,7 +141,6 @@ export const site = {
     lessonTypes: [
       "First lesson",
       "Beginner",
-      "University student",
       "Refresher",
       "Mock Test",
       "Motorway",
