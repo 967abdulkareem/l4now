@@ -27,9 +27,10 @@ export function Reservation() {
                 Ready for your next turn?
               </h2>
               <p data-anim-line className="mt-4 max-w-[24rem] text-[1.03rem] leading-[1.62] text-ink-soft">
-                Lessons run 1½ hours or 2 hours. Tell us which suits and
-                when, and we will come back with a slot — no deposit, no card
-                details, no obligation.
+                Manual lessons, booked as 1½ hour or 2 hour sessions. Prices
+                may vary by area and availability, and are confirmed when you
+                book — pay by bank transfer or cash once the lesson is agreed,
+                with no deposit.
               </p>
 
               <dl className="mt-9 flex flex-col gap-5 border-t border-hairline pt-7">

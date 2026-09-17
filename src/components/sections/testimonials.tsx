@@ -42,6 +42,25 @@ function splitQuote(quote: string) {
   return { lead: quote.slice(0, cut).trim(), rest: quote.slice(cut).trim() };
 }
 
+/**
+ * The hook is set at the size that lets it finish.
+ *
+ * Reviews are written, not commissioned, so the opening sentence runs from
+ * thirty characters to nearly two hundred. At one fixed size the long ones
+ * were clipped mid-sentence — the worst place to stop a quote. Three steps
+ * cover the range: the short ones get the display size they deserve, the
+ * long ones step down rather than lose their ending.
+ */
+function leadType(length: number) {
+  if (length <= 120) {
+    return "line-clamp-4 text-[1.22rem] leading-[1.32] lg:text-[1.34rem]";
+  }
+  if (length <= 170) {
+    return "line-clamp-5 text-[1.05rem] leading-[1.34] lg:text-[1.12rem]";
+  }
+  return "line-clamp-6 text-[0.98rem] leading-[1.38] lg:text-[1.02rem]";
+}
+
 /** Signed distance between two positions on the rail, the short way round. */
 function shortest(delta: number) {
   const wrapped = ((delta % count) + count) % count;
@@ -306,7 +325,7 @@ export function Testimonials() {
             onPointerMove={onPointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
-            className="relative h-[27rem] touch-pan-y select-none [perspective:1400px] sm:h-[26rem] lg:h-[28rem]"
+            className="relative h-[28rem] touch-pan-y select-none [perspective:1400px] sm:h-[27rem] lg:h-[29rem]"
           >
             {items.map((item, i) => {
               const { lead, rest } = splitQuote(item.quote);
@@ -327,7 +346,9 @@ export function Testimonials() {
                       : "cursor-pointer"
                   }`}
                 >
-                  <blockquote className="display line-clamp-4 text-[1.22rem] leading-[1.32] text-ink lg:text-[1.34rem]">
+                  <blockquote
+                    className={`display text-ink ${leadType(lead.length)}`}
+                  >
                     <span className="text-brand">&ldquo;</span>
                     {lead}
                     <span className="text-brand">&rdquo;</span>

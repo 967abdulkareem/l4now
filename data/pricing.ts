@@ -125,6 +125,10 @@ export const pricing: PriceItem[] = [
   },
 ];
 
-/** Small print shown under the grid. */
+/**
+ * Small print shown under the grid. The booking section spells out the terms
+ * in full, so this says only what a reader needs while they are still
+ * comparing cards.
+ */
 export const pricingNote =
-  "Manual lessons, booked as 1½ hour or 2 hour sessions. Prices may vary by area and availability, and are confirmed when you book — pay by bank transfer or cash once the lesson is agreed, with no deposit.";
+  "Every lesson is manual, in a dual-controlled car, booked as a 1½ hour or 2 hour session.";

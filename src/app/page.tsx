@@ -1,6 +1,7 @@
 import { RouteJourney } from "@/components/journey/route-journey";
 import { MotionRoot } from "@/components/motion-root";
 import { Pricing } from "@/components/sections/pricing";
+import { TheCar } from "@/components/sections/the-car";
 import { Faq } from "@/components/sections/faq";
 import { Hero } from "@/components/sections/hero";
 import { HowItWorks } from "@/components/sections/how-it-works";
@@ -38,6 +39,7 @@ export default function Home() {
             <Hero />
             <HowItWorks />
             <Pricing />
+            <TheCar />
             <Reservation />
           </RouteJourney>
 
