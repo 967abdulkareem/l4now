@@ -46,7 +46,40 @@ export function SiteFooter() {
                 </a>
               </li>
             )}
+            <li>
+              <a
+                href={site.contact.instagram.url}
+                aria-label={`${site.shortName} on Instagram`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-ink hover:text-brand hover:underline"
+              >
+                {/* Drawn here rather than imported: this icon set dropped
+                    its brand glyphs, and the mark is a square, a lens and a
+                    flash. */}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  className="size-4"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" />
+                </svg>
+                {site.contact.instagram.handle}
+              </a>
+            </li>
           </ul>
+
+          <address className="mt-5 text-[0.93rem] leading-[1.6] text-muted-foreground not-italic">
+            {site.contact.address.line1}
+            <br />
+            {site.contact.address.city} {site.contact.address.postcode}
+          </address>
         </div>
 
         <div>

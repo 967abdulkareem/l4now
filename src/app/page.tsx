@@ -21,9 +21,15 @@ function schema() {
     url: site.url,
     telephone: contact.phoneDisplay,
     email: contact.email,
-    // No street address is published, so the only place claim we can make
-    // truthfully is the area covered.
     areaServed: "Manchester, United Kingdom",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: contact.address.line1,
+      addressLocality: contact.address.city,
+      postalCode: contact.address.postcode,
+      addressCountry: "GB",
+    },
+    sameAs: [contact.instagram.url],
     openingHours: hours.map((row) => `${row.days} ${row.time}`),
   };
 }

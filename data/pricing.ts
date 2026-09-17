@@ -65,7 +65,7 @@ export const pricing: PriceItem[] = [
     id: "driving-lessons",
     name: "Driving lessons for every level",
     subtitle: "From your first drive to test day",
-    price: "From £33",
+    price: "£35",
     unit: "per hour",
     transmission: "manual",
     note: "Learn at your own pace with a fully qualified DVSA-approved ADI, in a dual-controlled car. Flexible lessons, a calm and friendly approach, and no pressure to book further lessons. From your first drive to test day, we will help you become a safe, confident driver.",

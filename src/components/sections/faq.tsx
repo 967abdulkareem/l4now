@@ -59,7 +59,19 @@ export function Faq() {
                   {faq.q}
                 </AccordionTrigger>
                 <AccordionContent className="pr-8 pb-6 text-[0.99rem] leading-[1.65] text-ink-soft">
-                  {faq.a}
+                  <p>{faq.a}</p>
+
+                  {"bullets" in faq && (
+                    <ul className="mt-3 flex flex-col gap-1.5">
+                      {faq.bullets.map((point) => (
+                        <li key={point} className="pl-1">
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {"outro" in faq && <p className="mt-3">{faq.outro}</p>}
                 </AccordionContent>
               </AccordionItem>
             ))}

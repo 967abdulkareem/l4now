@@ -32,6 +32,12 @@ export const site = {
      * nothing publishes a mailto: link to an address that does not exist.
      */
     email: "qdugesh@gmail.com" as string | null,
+    instagram: { handle: "@L_4now", url: "https://www.instagram.com/l_4now" },
+    address: {
+      line1: "30 Carlton Road",
+      city: "Manchester",
+      postcode: "M16 8LN",
+    },
   },
 
   hours: [{ days: "Monday – Sunday", time: "06:00 – 16:00" }],
@@ -78,19 +84,25 @@ export const site = {
   faqs: [
     {
       q: "How many lessons will I need?",
-      a: "It depends on how often you drive and how much private practice you get. We will give you an honest estimate after your first couple of lessons, and keep it updated as you go.",
+      a: "🚗 New to driving? The average learner needs around 40–50 hours of professional tuition. Every learner is different, though — you could need fewer or more, depending on your progress, your confidence and how much you practise between lessons.",
+      outro:
+        "We will assess your progress throughout and tailor your lessons to what you need.",
     },
     {
       q: "Do you teach automatic?",
-      a: "No — lessons are manual only, in a dual-controlled manual car. A manual licence lets you drive both, so it is the licence worth having if you are choosing.",
-    },
-    {
-      q: "Do you pick me up from home?",
-      a: "Yes, anywhere inside Manchester, at no extra cost. Home, work, school, college or the station — whatever is easiest that day.",
+      a: "Not at the moment. We specialise in manual driving lessons, and learning manual gives you:",
+      bullets: [
+        "💷 Cheaper lesson fees than many automatic lessons",
+        "🚗 Freedom to drive both manual and automatic cars once you pass",
+        "💰 More affordable options when buying or hiring a car",
+        "🌍 More flexibility when driving abroad",
+        "🔑 Generally lower costs and more choice with a manual licence",
+      ],
+      outro: "Learn manual. Keep your options open.",
     },
     {
       q: "Which test centre will I use?",
-      a: "We cover West Didsbury, Cheetham Hill, Sale and Bredbury. You book the test at whichever suits you, and we spend the lessons before it on the roads, junctions and manoeuvres that centre is known for.",
+      a: "We cover West Didsbury, Cheetham Hill, Sale and Bredbury.",
     },
     {
       q: "What happens in the first lesson?",
@@ -98,7 +110,7 @@ export const site = {
     },
     {
       q: "How much do lessons cost?",
-      a: "A first lesson is £32 an hour, down from £35. After that lessons start at £33 an hour, university students at £33, refreshers at £35 and motorway lessons at £45. Everything is booked as a 1½ hour or 2 hour session, and we confirm the price when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
+      a: "A first lesson is £32 an hour, down from £35. After that lessons are £35 an hour, university students £33, refreshers from £35 and motorway lessons from £45. Everything is booked as a 1½ hour or 2 hour session, and we confirm the price when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
     },
     {
       q: "I am nervous. Is that a problem?",
