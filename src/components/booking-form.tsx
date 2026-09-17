@@ -14,7 +14,6 @@ type Fields = {
   date: string;
   time: string;
   lessonType: string;
-  duration: string;
   message: string;
 };
 
@@ -26,7 +25,6 @@ const EMPTY: Fields = {
   date: "",
   time: "",
   lessonType: "",
-  duration: "",
   message: "",
 };
 
@@ -37,7 +35,6 @@ const FIELD_ORDER: (keyof Fields)[] = [
   "date",
   "time",
   "lessonType",
-  "duration",
 ];
 
 const LABELS: Record<keyof Fields, string> = {
@@ -46,7 +43,6 @@ const LABELS: Record<keyof Fields, string> = {
   date: "Preferred date",
   time: "Preferred time",
   lessonType: "Lesson type",
-  duration: "Lesson length",
   message: "Anything else we should know",
 };
 
@@ -111,7 +107,6 @@ function validate(values: Fields): Errors {
 
   if (!values.time) errors.time = "Choose roughly when suits you.";
   if (!values.lessonType) errors.lessonType = "Choose the kind of lesson.";
-  if (!values.duration) errors.duration = "Choose how long the lesson runs.";
 
   return errors;
 }
@@ -130,7 +125,6 @@ function composeMessage(v: Fields) {
     `Name: ${v.name.trim()}`,
     `Phone: ${v.phone.trim()}`,
     `Lesson type: ${v.lessonType}`,
-    `Lesson length: ${v.duration}`,
     `Preferred date: ${when}`,
     `Preferred time: ${v.time}`,
   ];
@@ -360,6 +354,7 @@ export function BookingForm() {
           htmlFor={id("lessonType")}
           error={errors.lessonType}
           errorId={errorId("lessonType")}
+          className="sm:col-span-2"
         >
           <select
             data-field="lessonType"
@@ -377,35 +372,6 @@ export function BookingForm() {
             {site.booking.lessonTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        {/* Lessons are sold by the session, so the length is part of the
-            enquiry rather than something to sort out over WhatsApp. */}
-        <Field
-          label={LABELS.duration}
-          htmlFor={id("duration")}
-          error={errors.duration}
-          errorId={errorId("duration")}
-        >
-          <select
-            data-field="duration"
-            id={id("duration")}
-            name="duration"
-            value={values.duration}
-            onChange={(e) => set("duration", e.target.value)}
-            aria-invalid={Boolean(errors.duration)}
-            aria-describedby={
-              errors.duration ? errorId("duration") : undefined
-            }
-            className={control(Boolean(errors.duration))}
-          >
-            <option value="">Choose a lesson length</option>
-            {site.booking.lessonLengths.map((length) => (
-              <option key={length} value={length}>
-                {length}
               </option>
             ))}
           </select>

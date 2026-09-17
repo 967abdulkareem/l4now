@@ -148,8 +148,6 @@ export const site = {
       "Intensive course",
       "Gift voucher",
     ],
-    /** Every lesson is booked as one of these. Prices match data/pricing.ts. */
-    lessonLengths: ["1½ hours", "2 hours"],
     timeSlots: [
       "Early morning (06:00 – 09:00)",
       "Morning (09:00 – 12:00)",
