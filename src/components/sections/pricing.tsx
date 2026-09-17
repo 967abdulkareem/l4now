@@ -29,10 +29,13 @@ export function Pricing() {
             </p>
           </div>
 
-          {/* gap-x-14 is the route's gutter, not decoration — keep it. */}
+          {/* Two columns rather than three: the cards carry several
+              sentences each now, and at a third of the width that is a column
+              of thin text. gap-x-14 is the route's gutter, not decoration —
+              keep it. */}
           <ul
             data-course-grid
-            className="mt-20 grid gap-y-16 lg:grid-cols-3 lg:items-stretch lg:gap-x-14"
+            className="mt-20 grid gap-y-16 lg:grid-cols-2 lg:items-stretch lg:gap-x-14"
           >
             {pricing.map((item, i) => {
               const ask = item.price === TODO_PRICE;
@@ -49,12 +52,15 @@ export function Pricing() {
                   data-anim-item
                   data-hover-lift
                   {...(featured ? { "data-featured": "" } : {})}
-                  // The first three cards define the route's weave through the
-                  // grid; the rest sit below it.
-                  {...(i < 3 ? { "data-route-row": "" } : {})}
+                  // The first row defines the route's weave through the grid;
+                  // the rest sit below it.
+                  {...(i < 2 ? { "data-route-row": "" } : {})}
+                  // The full-width card spans both columns, so the route's
+                  // gutter run has to stop above it rather than through it.
+                  {...(item.wide ? { "data-wide": "" } : {})}
                   className={`card-surface group relative flex h-full flex-col p-7 transition-[box-shadow,border-color] duration-300 data-[passed=true]:shadow-[0_14px_34px_-22px_rgb(17_17_17/0.3)] lg:p-8 ${
                     featured ? "border-brand ring-1 ring-brand/25" : ""
-                  }`}
+                  } ${item.wide ? "lg:col-span-2" : ""}`}
                 >
                   {item.badge && (
                     <span className="absolute -top-3 left-7 rounded-full bg-brand px-3 py-1 text-[0.72rem] font-bold tracking-[0.1em] text-white uppercase lg:left-8">
@@ -97,15 +103,44 @@ export function Pricing() {
                     </p>
                   )}
 
-                  <p className="mt-4 flex-1 text-[0.97rem] leading-[1.62] text-ink-soft">
+                  <p
+                    className={`mt-4 text-[0.97rem] leading-[1.62] text-ink-soft ${
+                      item.bullets ? "" : "flex-1"
+                    } ${item.wide ? "max-w-[46rem]" : ""}`}
+                  >
                     {item.note}
                   </p>
+
+                  {item.bullets && (
+                    <div className="mt-5 flex-1">
+                      <p className="text-[0.86rem] font-semibold text-ink">
+                        Choose from
+                      </p>
+                      <ul className="mt-3 flex flex-wrap gap-2">
+                        {item.bullets.map((option) => (
+                          <li
+                            key={option}
+                            className="rounded-full border border-ink/12 px-3.5 py-1.5 text-[0.9rem] text-ink-soft"
+                          >
+                            {option}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   <a
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`mt-7 w-full ${featured ? "btn-primary" : "btn-quiet"}`}
+                    // The card is a flex column, so a narrower button needs
+                    // self-start as well as a width — stretch would override
+                    // the width alone.
+                    className={`mt-7 ${
+                      item.wide ? "w-full sm:w-auto sm:self-start sm:px-10" : "w-full"
+                    } ${
+                      featured ? "btn-primary" : "btn-quiet"
+                    }`}
                   >
                     <MessageCircle className="size-4" aria-hidden="true" />
                     {ask ? "Ask us" : item.ctaLabel}

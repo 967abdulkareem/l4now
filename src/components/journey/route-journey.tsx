@@ -175,9 +175,10 @@ export function RouteJourney({ children }: { children: ReactNode }) {
 
           // 4. Thread the gutters. The cards in a row are the same height —
           //    misaligned cards read as a mistake — so the weave comes from
-          //    the grid's own empty columns instead of a vertical stagger:
-          //    in above the row, down the first gutter, across the row gap,
-          //    down the second gutter, out below the grid.
+          //    the grid's own empty columns rather than a vertical stagger:
+          //    in above the row, down a gutter, across, down the next, out
+          //    below the grid. Two columns leave one gutter and three leave
+          //    two, so the run is built from however many there are.
           const rowCards = Array.from(
             root!.querySelectorAll<HTMLElement>("[data-route-row]"),
           );
@@ -185,28 +186,38 @@ export function RouteJourney({ children }: { children: ReactNode }) {
             .map((c) => box(c, wrapRect))
             .filter((b): b is Box => Boolean(b));
 
+          const gutters = rects
+            .slice(0, -1)
+            .map((card, i) => (card.right + rects[i + 1].left) / 2);
+
           const yAbove = grid.top - 40;
           pts.push([xLeft, yAbove]);
 
-          if (rects.length === 3) {
-            const [c1, c2, c3] = rects;
-            const g1 = (c1.right + c2.left) / 2;
-            const g2 = (c2.right + c3.left) / 2;
-            // Midway down the gap between the two rows, so the crossing run
-            // clears both of them.
-            const yGap = (c1.bottom + Math.min(grid.bottom, c1.bottom + 64)) / 2;
-
+          if (gutters.length) {
             // The grid box can sit a little above its own last row, so take
-            // the lowest card rather than trusting the container.
-            const cardBottoms = cards
-              .map((c) => box(c, wrapRect)?.bottom ?? 0)
-              .concat(grid.bottom);
+            // the lowest card rather than trusting the container — and skip
+            // any card that spans every column, since the gutter the run is
+            // following does not exist where that card is.
+            const columned = cards.filter((c) => !c.hasAttribute("data-wide"));
+            const cardBottoms = (columned.length ? columned : cards).map(
+              (c) => box(c, wrapRect)?.bottom ?? 0,
+            );
             const yBelow = Math.max(...cardBottoms) + 36;
 
-            pts.push([g1, yAbove]);
-            pts.push([g1, yGap]);
-            pts.push([g2, yGap]);
-            pts.push([g2, yBelow]);
+            // Midway down the gap below the first row, so a crossing run
+            // clears the cards above and below it.
+            const firstRowBottom = rects[0].bottom;
+            const yGap = (firstRowBottom + Math.min(yBelow, firstRowBottom + 64)) / 2;
+
+            pts.push([gutters[0], yAbove]);
+            pts.push([gutters[0], gutters.length > 1 ? yGap : yBelow]);
+
+            for (let i = 1; i < gutters.length; i += 1) {
+              const last = i === gutters.length - 1;
+              pts.push([gutters[i], yGap]);
+              pts.push([gutters[i], last ? yBelow : yGap]);
+            }
+
             pts.push([xRight, yBelow]);
           } else {
             pts.push([xRight, yAbove]);

@@ -98,7 +98,7 @@ export const site = {
     },
     {
       q: "How much do lessons cost?",
-      a: "A first lesson starts at £32 an hour, lessons after that at £35, and school and college students at £32. Motorway lessons start at £45. Everything is booked as a 1½ hour or 2 hour session, and we confirm the price when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
+      a: "A first lesson is £32 an hour, down from £35. After that lessons start at £33 an hour, university students at £33, refreshers at £35 and motorway lessons at £45. Everything is booked as a 1½ hour or 2 hour session, and we confirm the price when you enquire. Pay by bank transfer or cash once the lesson is agreed on WhatsApp, with no deposit.",
     },
     {
       q: "I am nervous. Is that a problem?",
@@ -129,10 +129,12 @@ export const site = {
     lessonTypes: [
       "First lesson",
       "Beginner",
-      "School or college student",
+      "University student",
       "Refresher",
       "Test prep",
       "Motorway",
+      "Intensive course",
+      "Gift voucher",
     ],
     /** Every lesson is booked as one of these. Prices match data/pricing.ts. */
     lessonLengths: ["1½ hours", "2 hours"],
