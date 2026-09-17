@@ -120,7 +120,7 @@ function composeMessage(v: Fields) {
     : v.date;
 
   const lines = [
-    `Hello ${site.instructor} at ${site.shortName} — I would like to book a lesson.`,
+    `Hi ${site.instructor} at ${site.shortName} — I would like to book a lesson.`,
     "",
     `Name: ${v.name.trim()}`,
     `Phone: ${v.phone.trim()}`,

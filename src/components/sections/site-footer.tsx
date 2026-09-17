@@ -28,7 +28,7 @@ export function SiteFooter() {
           <ul className="mt-4 flex flex-col gap-2.5 text-[0.94rem]">
             <li>
               <a
-                href={whatsappLink(`Hello ${site.instructor} at ${site.shortName} — I have a question.`)}
+                href={whatsappLink(`Hi ${site.instructor} at ${site.shortName} — I have a question.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-ink hover:text-brand hover:underline"

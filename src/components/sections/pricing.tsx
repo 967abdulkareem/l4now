@@ -41,7 +41,7 @@ export function Pricing() {
               const ask = item.price === TODO_PRICE;
               const featured = Boolean(item.badge);
               const href = whatsappLink(
-                `Hello ${site.instructor} at ${site.shortName} — I would like to ask about ${item.name}.`,
+                `HI ${site.instructor} at ${site.shortName} — I would like to Inquir about ${item.name}.`,
               );
 
               return (
@@ -124,7 +124,7 @@ export function Pricing() {
                           <li key={option}>
                             <a
                               href={whatsappLink(
-                                `Hello ${site.instructor} at ${site.shortName} — I would like to ask about a ${item.name.toLowerCase()}: ${option}.`,
+                                `Hi ${site.instructor} at ${site.shortName} — I would like to Inquire about a ${item.name.toLowerCase()}: ${option}.`,
                               )}
                               target="_blank"
                               rel="noopener noreferrer"

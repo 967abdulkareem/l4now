@@ -143,7 +143,7 @@ export const site = {
       "Beginner",
       "University student",
       "Refresher",
-      "Test prep",
+      "Mock Test",
       "Motorway",
       "Intensive course",
       "Gift voucher",
