@@ -49,12 +49,12 @@ export const site = {
   trustSignals: [
     "DVSA-approved instructor (ADI)",
     "Manual lessons",
-    "Pick-up and drop-off included",
+    "Manchester Based Driving School",
   ],
 
   /** One line instead of a coverage table. */
   coverage:
-    "Manchester based, with pick-up and drop-off inside Manchester included.",
+    "Manchester based, with pick-up inside Manchester included.",
 
   /** The centres we teach towards, and know the routes around. */
   testCentres: ["West Didsbury", "Cheetham Hill", "Sale", "Bredbury"],
