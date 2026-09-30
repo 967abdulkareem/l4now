@@ -24,8 +24,8 @@ export function Pricing() {
               What it costs.
             </h2>
             <p data-anim-line className="mt-4 text-[1.05rem] leading-[1.6] text-ink-soft">
-              Every lesson is with a DVSA-approved instructor (ADI), in a
-              dual-controlled car, with pick-up and drop-off included.
+              Every lesson is with a DVSA-approved instructor (ADI), in a Friendly & comfortable learning environment,
+               with dual-controlled car.
             </p>
           </div>
 

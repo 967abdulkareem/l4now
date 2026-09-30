@@ -4,7 +4,6 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { site } from "@/lib/site";
-import { GoogleAnalytics } from "@next/third-parties/google";
 
 import "./globals.css";
 
@@ -66,6 +65,23 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB" className={jakarta.variable}>
+      <head>
+        {/* Google-provided shared tag, included in the static HTML on every page. */}
+        {/* eslint-disable-next-line @next/next/next-script-for-ga */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-76P2T1RNS7"
+        />
+        <script
+          id="google-tag-init"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-76P2T1RNS7');`,
+          }}
+        />
+      </head>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
@@ -76,7 +92,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScroll />
         <SiteHeader />
         {children}
-        <GoogleAnalytics gaId="G-76P2T1RNS7" />
       </body>
     </html>
   );
