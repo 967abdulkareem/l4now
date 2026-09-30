@@ -4,6 +4,7 @@ import { AlertCircle, MessageCircle } from "lucide-react";
 import { useId, useRef, useState } from "react";
 
 import { site } from "@/lib/site";
+import { trackEnquiry } from "@/lib/analytics";
 import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/whatsapp";
 
 /* The WhatsApp number itself lives in src/lib/whatsapp.ts — change it there. */
@@ -166,6 +167,7 @@ export function BookingForm() {
     // message addressed to us, and presses send themselves.
     const link = whatsappLink(composeMessage(values));
     setSentLink(link);
+    trackEnquiry("booking_form");
     window.open(link, "_blank", "noopener,noreferrer");
   };
 

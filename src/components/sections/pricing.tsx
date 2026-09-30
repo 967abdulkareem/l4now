@@ -123,6 +123,7 @@ export function Pricing() {
                         {item.bullets.map((option) => (
                           <li key={option}>
                             <a
+                              data-enquiry-source={`gift_voucher_${option}`}
                               href={whatsappLink(
                                 `Hi ${site.instructor} at ${site.shortName} — I would like to Inquire about a ${item.name.toLowerCase()}: ${option}.`,
                               )}
@@ -140,6 +141,7 @@ export function Pricing() {
                   )}
 
                   <a
+                    data-enquiry-source={`pricing_${item.id}`}
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"

@@ -29,6 +29,7 @@ export function SiteFooter() {
             <li>
               <a
                 href={whatsappLink(`Hi ${site.instructor} at ${site.shortName} — I have a question.`)}
+                data-enquiry-source="footer"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-ink hover:text-brand hover:underline"

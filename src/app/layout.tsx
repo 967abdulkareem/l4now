@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { SiteHeader } from "@/components/site-header";
+import { EnquiryTracking } from "@/components/enquiry-tracking";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { site } from "@/lib/site";
 
@@ -90,6 +91,7 @@ gtag('config', 'G-76P2T1RNS7');`,
           Skip to content
         </a>
         <SmoothScroll />
+        <EnquiryTracking />
         <SiteHeader />
         {children}
       </body>
