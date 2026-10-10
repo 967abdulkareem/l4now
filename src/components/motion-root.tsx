@@ -29,7 +29,9 @@ export function MotionRoot({ children }: { children: ReactNode }) {
 
       // Reduced motion: nothing is registered, so nothing is ever hidden and
       // the page is already in its final state.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Phones render sections immediately; only the route follows scroll.
+      // This avoids delayed text/card entrances while the road is visible.
+      mm.add("(prefers-reduced-motion: no-preference) and (min-width: 1024px)", () => {
         const splits: SplitText[] = [];
 
         /**
@@ -93,6 +95,9 @@ export function MotionRoot({ children }: { children: ReactNode }) {
         // ---- the rest: one timeline per section ---------------------------
         scope.querySelectorAll<HTMLElement>("[data-section]").forEach((section) => {
           const kind = section.dataset.section;
+          // These sections share the route's gutters. Their content must be
+          // in its final position before the road is drawn at every width.
+          if (kind === "steps" || kind === "pricing") return;
           const tl = sectionTimeline(section);
 
           const heading = section.querySelector<HTMLElement>("[data-anim-heading]");

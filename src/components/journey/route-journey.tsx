@@ -108,6 +108,31 @@ export function RouteJourney({ children }: { children: ReactNode }) {
       const dot = root.querySelector<SVGGElement>("[data-gps-dot]");
       const finishMark = root.querySelector<SVGGElement>("[data-destination]");
       if (!svg || !base || !done || !dot || !finishMark) return;
+      let readyTimer = 0;
+      let readyFrame = 0;
+      let disposed = false;
+      let fontsReady = false;
+      const settling = () => {
+        root.dataset.routeReady = "false";
+        window.clearTimeout(readyTimer);
+        cancelAnimationFrame(readyFrame);
+      };
+      const settled = () => {
+        if (!fontsReady || disposed) return;
+        window.clearTimeout(readyTimer);
+        readyTimer = window.setTimeout(() => {
+          readyFrame = requestAnimationFrame(() => {
+            readyFrame = requestAnimationFrame(() => {
+              if (!disposed) root.dataset.routeReady = "true";
+            });
+          });
+        }, 250);
+      };
+      void document.fonts.ready.then(() => {
+        if (disposed) return;
+        fontsReady = true;
+        settled();
+      });
 
       const pins = Array.from(
         root.querySelectorAll<SVGGElement>("[data-route-pin]"),
@@ -118,6 +143,27 @@ export function RouteJourney({ children }: { children: ReactNode }) {
 
       const box = (el: Element | null, wrapRect: DOMRect): Box | null => {
         if (!el) return null;
+        // Reveals and hover lifts transform the cards. Measure their layout
+        // boxes so a refresh never bends the road around an animation frame.
+        if (el instanceof HTMLElement) {
+          let left = 0;
+          let top = 0;
+          let parent: HTMLElement | null = el;
+          while (parent && parent !== root) {
+            left += parent.offsetLeft;
+            top += parent.offsetTop;
+            parent = parent.offsetParent as HTMLElement | null;
+            if (parent && parent !== root) {
+              left += parent.clientLeft;
+              top += parent.clientTop;
+            }
+          }
+          if (parent === root) {
+            const w = el.offsetWidth;
+            const h = el.offsetHeight;
+            return { left, top, right: left + w, bottom: top + h, w, h, cx: left + w / 2, cy: top + h / 2 };
+          }
+        }
         const r = el.getBoundingClientRect();
         return {
           left: r.left - wrapRect.left,
@@ -133,6 +179,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
 
       /** Builds the waypoints for the current layout. */
       function buildRoute() {
+        settling();
         const wrapRect = root!.getBoundingClientRect();
         const W = root!.offsetWidth;
         const H = root!.offsetHeight;
@@ -415,7 +462,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           cards.forEach((c) => {
             c.dataset.passed = "true";
           });
-          root.dataset.routeReady = "true";
+          settled();
         };
 
         draw();
@@ -424,6 +471,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
         // it has to be redrawn whenever the layout settles or changes.
         let pending = 0;
         const redraw = () => {
+          settling();
           window.clearTimeout(pending);
           pending = window.setTimeout(draw, 120);
         };
@@ -528,17 +576,19 @@ export function RouteJourney({ children }: { children: ReactNode }) {
             tl.invalidate();
             progressMap = buildProgressMap(base);
             render(self.progress);
+            settled();
           },
         });
 
         render(trigger.progress);
-        root.dataset.routeReady = "true";
+        settled();
 
         // Anything that changes the page height moves every anchor the route
         // is built from: viewport resize, webfonts swapping in, an accordion
         // opening. A ResizeObserver catches all of them.
         let pending = 0;
         const refresh = () => {
+          settling();
           window.clearTimeout(pending);
           pending = window.setTimeout(() => ScrollTrigger.refresh(), 120);
         };
@@ -555,7 +605,12 @@ export function RouteJourney({ children }: { children: ReactNode }) {
         };
       });
 
-      return () => mm.revert();
+      return () => {
+        disposed = true;
+        window.clearTimeout(readyTimer);
+        cancelAnimationFrame(readyFrame);
+        mm.revert();
+      };
     },
     { scope: wrap },
   );

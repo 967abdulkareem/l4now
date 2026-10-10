@@ -60,7 +60,7 @@ export function Hero() {
 
             <p
               data-hero-line
-              className="mt-7 max-w-[30rem] text-[1.08rem] leading-[1.6] text-ink-soft sm:text-[1.18rem]"
+              className="mt-6 w-[calc(100%+1rem)] max-w-[34rem] text-[0.95rem] leading-[1.6] text-ink-soft sm:w-full sm:text-[1.05rem] lg:text-[1.1rem]"
             >
               L_4NOW Driving School proudly serves Manchester, helping learners
               build confidence behind the wheel.
