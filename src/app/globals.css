@@ -267,3 +267,31 @@
     animation-duration: 1ms;
   }
 }
+/* Mobile first paint: image and logo require no animation bundle. The CSS
+   escape hatch also dismisses the overlay if hydration never completes. */
+.mobile-loading-screen { display: none; }
+@media (max-width: 767px) {
+  .mobile-loading-screen {
+    position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
+    background: white; pointer-events: none;
+    animation: loading-failsafe 0.2s 6s forwards;
+    transition: opacity 0.24s ease, visibility 0.24s;
+  }
+  .mobile-loading-screen[data-ready="true"] { opacity: 0; visibility: hidden; }
+  .mobile-loading-screen[data-ready="false"] { transition: none; }
+  .mobile-loading-map { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: .65; }
+  .mobile-loading-brand {
+    position: relative; display: flex; flex-direction: column; align-items: center;
+    padding: 40px 24px; margin: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+    background: radial-gradient(ellipse, white 45%, rgb(255 255 255 / .92) 65%, transparent 73%);
+  }
+  .mobile-loading-brand p { margin-top: 18px; font-size: 13px; color: #555; }
+  .mobile-loading-track { width: 96px; height: 3px; margin-top: 20px; overflow: hidden; background: #f8dada; border-radius: 3px; }
+  .mobile-loading-track span { display: block; width: 40%; height: 100%; background: #e52222; animation: loading-travel 1.1s ease-in-out infinite; }
+}
+@keyframes loading-travel { from { transform: translateX(-100%); } to { transform: translateX(350%); } }
+@keyframes loading-failsafe { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) {
+  .mobile-loading-screen { transition: none; }
+  .mobile-loading-track span { animation: none; transform: translateX(75%); }
+}

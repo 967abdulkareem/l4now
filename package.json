@@ -9,6 +9,7 @@
     "lint": "eslint",
     "screenshots": "node scripts/screenshots.mjs",
     "map": "python scripts/generate-map-data.py",
+    "map:images": "node scripts/export-map-images.cjs",
     "typecheck": "tsc --noEmit",
     "audit": "node scripts/audit.mjs",
     "logo": "node scripts/process-logo.mjs",

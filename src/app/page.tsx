@@ -1,4 +1,5 @@
 import { RouteJourney } from "@/components/journey/route-journey";
+import { MobileLoadingScreen } from "@/components/mobile-loading-screen";
 import { MotionRoot } from "@/components/motion-root";
 import { Pricing } from "@/components/sections/pricing";
 import { TheCar } from "@/components/sections/the-car";
@@ -37,6 +38,7 @@ function schema() {
 export default function Home() {
   return (
     <>
+      <MobileLoadingScreen />
       <span id="top" />
       <main id="main">
         <MotionRoot>

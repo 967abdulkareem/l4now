@@ -115,12 +115,28 @@ export function SiteHeader() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={site.contact.phoneHref}
-                className="mt-4 mb-2 inline-flex h-11 items-center rounded-xl border border-ink/12 bg-white px-4 text-[0.95rem] font-medium text-ink"
-              >
-                {WHATSAPP_DISPLAY}
-              </a>
+              <div className="mt-4 mb-2 flex flex-wrap items-center gap-3">
+                <a
+                  href={site.contact.phoneHref}
+                  className="inline-flex h-11 items-center rounded-xl border border-ink/12 bg-white px-4 text-[0.95rem] font-medium text-ink transition-colors hover:border-brand hover:text-brand"
+                >
+                  {WHATSAPP_DISPLAY}
+                </a>
+                <a
+                  href={site.contact.instagram.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Instagram ${site.contact.instagram.handle} (opens in a new tab)`}
+                  className="inline-flex h-11 items-center gap-2 rounded-xl border border-ink/12 bg-white px-4 text-[0.95rem] font-medium text-ink transition-colors hover:border-brand hover:text-brand"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="size-4" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                  {site.contact.instagram.handle}
+                </a>
+              </div>
             </nav>
         </div>
       </div>

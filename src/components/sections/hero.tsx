@@ -1,6 +1,5 @@
 import { Car, MapPin, ShieldCheck } from "lucide-react";
 
-import { MapArt } from "@/components/journey/map-art";
 import { Lanes } from "@/components/lanes";
 import { site } from "@/lib/site";
 
@@ -23,19 +22,13 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden lg:inset-y-0 lg:right-0 lg:left-auto lg:z-auto lg:w-[62%]"
       >
-        {/* One map, two framings. The artwork is a few thousand elements, so
-            rendering it twice — once cropped for phones, once whole for wide
-            screens — doubled the page's HTML for markup that is hidden half
-            the time. Instead the phone framing is a CSS zoom on the same
-            element: same effect as a tighter viewBox, no second copy, and no
-            JavaScript deciding which to show.
-
-            The primary road goes with the wide framing. On the phone crop no
-            route is drawn over it and it reads as a stray band. */}
-        <MapArt
-          className="absolute inset-0 h-full w-full origin-[42%_32%] scale-[1.65] opacity-90 md:origin-center md:scale-100 md:opacity-70 lg:opacity-100"
-          roadClassName="hidden md:block"
-        />
+        {/* Rasterized from MapArt: one image replaces thousands of SVG nodes.
+            object-fit uses the same crop as the route's mapProjector. */}
+        <picture>
+          <source media="(max-width: 767px)" srcSet="/map-mobile.webp" />
+          <img src="/map.webp" width="1100" height="1000" alt="" fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover origin-[42%_32%] scale-[1.65] opacity-90 md:origin-center md:scale-100 md:opacity-70 lg:opacity-100" />
+        </picture>
 
         {/* Scrims. Phones and tablets get a flat wash plus a fade behind the
             copy; wide screens keep the horizontal fade. */}
@@ -69,8 +62,12 @@ export function Hero() {
               data-hero-line
               className="mt-7 max-w-[30rem] text-[1.08rem] leading-[1.6] text-ink-soft sm:text-[1.18rem]"
             >
-              Patient, practical driving lessons. Progress at your pace, from
-              your first turn to test day.
+              L_4NOW Driving School proudly serves Manchester, helping learners
+              build confidence behind the wheel.
+              <br />
+              From your first lesson to test day, we provide personalised,
+              experienced instruction to help you pass your test and enjoy the
+              freedom of driving.
             </p>
 
             <div

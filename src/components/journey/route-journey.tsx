@@ -415,6 +415,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
           cards.forEach((c) => {
             c.dataset.passed = "true";
           });
+          root.dataset.routeReady = "true";
         };
 
         draw();
@@ -531,6 +532,7 @@ export function RouteJourney({ children }: { children: ReactNode }) {
         });
 
         render(trigger.progress);
+        root.dataset.routeReady = "true";
 
         // Anything that changes the page height moves every anchor the route
         // is built from: viewport resize, webfonts swapping in, an accordion

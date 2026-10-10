@@ -67,11 +67,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB" className={jakarta.variable}>
       <head>
-        {/* Google-provided shared tag, included in the static HTML on every page. */}
+        {/* One Google loader for Ads and Analytics, included on every static page. */}
         {/* eslint-disable-next-line @next/next/next-script-for-ga */}
         <script
           async
-          src="https://www.googletagmanager.com/gtag/js?id=G-76P2T1RNS7"
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18458527086"
         />
         <script
           id="google-tag-init"
@@ -79,7 +79,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-76P2T1RNS7');`,
+gtag('config', 'G-76P2T1RNS7');
+gtag('config', 'AW-18458527086');`,
           }}
         />
       </head>
